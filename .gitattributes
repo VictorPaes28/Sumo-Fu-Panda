@@ -1,0 +1,13 @@
+# Texto com fim de linha LF no repositório (evita diffs gigantes entre Windows e Linux)
+* text=auto eol=lf
+
+# Arquivos binários: nunca converter
+*.glb binary
+*.gltf binary
+*.png binary
+*.jpg binary
+*.wav binary
+*.ogg binary
+*.ttf binary
+*.pdf binary
+*.blend binary

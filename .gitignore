@@ -1,0 +1,19 @@
+# build
+build/
+build-make/
+cmake-build-*/
+*.exe
+*.o
+*.obj
+*.pdb
+*.ilk
+
+# editores
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# arquivos de trabalho da arte (os .glb finais entram no git)
+*.blend1
+assets/**/rascunho/
