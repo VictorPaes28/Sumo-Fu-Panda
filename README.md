@@ -28,6 +28,8 @@ reais de sumô e 4 personagens:
 | Qualquer pessoa do grupo | `docs/ARQUITETURA.md` |
 | Integrante A (estruturas) | `docs/tarefas/TAREFA-A-estruturas.md` |
 | Integrante B (interface) | `docs/tarefas/TAREFA-B-interface.md` |
+| Arthur (telas de seleção e montagem) | `docs/tarefas/TAREFA-ARTHUR.md` |
+| Mateus (estruturas e sons) | `docs/tarefas/TAREFA-MATEUS.md` |
 | Principal (física e integração) | `docs/tarefas/TAREFA-PRINCIPAL.md` |
 | Equipe de arte | `docs/ASSETS.md` |
 | Golpes, animações e referências de sumô | `docs/ANIMACOES.md` |
