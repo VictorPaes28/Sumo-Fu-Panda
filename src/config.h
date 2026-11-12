@@ -263,4 +263,10 @@
 /* ---------------------------------------------------------------- Personagens */
 #define MAX_PERSONAGENS           8
 
+/* ---------------------------------------------------------------- Telas */
+#define SELECAO_CARTOES_POR_LINHA 4      /* cartões de personagem lado a lado na seleção;
+                                            com mais personagens, a grade ganha outra linha */
+#define MONTAGEM_GOLPES_VISIVEIS  7      /* golpes da lista que aparecem de uma vez na
+                                            montagem; o resto aparece rolando */
+
 #endif /* CONFIG_H */
