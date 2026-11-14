@@ -114,7 +114,7 @@ void combate_aplicar_golpe(Lutador *atacante, Lutador *alvo,
     float escala = powf(DANO_ESCALA_SEGUIDOS, (float)alvo->golpes_seguidos);
     alvo->golpes_seguidos++;
     alvo->ultimo_golpe_recebido = relogio;
-    hematoma_inserir(&alvo->hematomas, g->dano * escala, relogio + g->tempo_cura);
+    hematomas_inserir(&alvo->hematomas, g->dano * escala, relogio + g->tempo_cura);
 
     Vector3 dir = Vector3Subtract(corpo_posicao(&alvo->corpo), corpo_posicao(&atacante->corpo));
     dir.y = 0.0f;

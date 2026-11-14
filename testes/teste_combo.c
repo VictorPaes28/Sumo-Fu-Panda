@@ -325,17 +325,18 @@ static void teste_trocar(void)
     TESTE("trocar com o proximo, inclusive o ultimo com o primeiro");
     Combo c;
     montar(&c, QUATRO, 4);                            /* [E L T B] */
-    combo_avancar(&c);
+    combo_avancar(&c);                                /* atual = L */
+    NoCombo *atual_antes = c.atual;
     VERIFICA(combo_trocar_com_proximo(&c, 1));        /* [E T L B] */
     TipoGolpe e1[4] = { GOLPE_EMPURRAO, GOLPE_TAPA_LATERAL, GOLPE_LEVANTADOR, GOLPE_BARRIGADA };
     VERIFICA(sequencia_igual(&c, e1, 4));
-    VERIFICA(c.atual == c.inicio);                    /* troca reinicia o atual */
+    VERIFICA(c.atual == atual_antes);                 /* troca nao muda o atual */
     VERIFICA(combo_consistente(&c));
 
     VERIFICA(combo_trocar_com_proximo(&c, 3));        /* ultimo <-> primeiro: [B T L E] */
     TipoGolpe e2[4] = { GOLPE_BARRIGADA, GOLPE_TAPA_LATERAL, GOLPE_LEVANTADOR, GOLPE_EMPURRAO };
     VERIFICA(sequencia_igual(&c, e2, 4));
-    VERIFICA(combo_golpe_atual(&c) == GOLPE_BARRIGADA);
+    VERIFICA(combo_golpe_atual(&c) == GOLPE_LEVANTADOR); /* atual continua no L */
     VERIFICA(combo_consistente(&c));
     combo_liberar(&c);
 }
@@ -354,6 +355,60 @@ static void teste_trocar_invalido(void)
     VERIFICA(sequencia_igual(&c, QUATRO, 2));
     VERIFICA(combo_consistente(&c));
     combo_liberar(&c);
+}
+
+static void teste_trocar_nao_muda_atual(void)
+{
+    TESTE("trocar nao muda o golpe atual, para toda posicao do atual e da troca");
+    /* Todas as combinações em um combo de 4: o atual em cada posição (0 a 3)
+     * e a troca em cada posição (0 a 3, a 3 troca o último com o primeiro).
+     * Inclui os casos em que o atual é um dos dois nós trocados. */
+    for (int pos_atual = 0; pos_atual < 4; pos_atual++) {
+        for (int pos_troca = 0; pos_troca < 4; pos_troca++) {
+            Combo c;
+            montar(&c, QUATRO, 4);
+            for (int k = 0; k < pos_atual; k++)
+                combo_avancar(&c);
+            NoCombo *no_antes = c.atual;
+            TipoGolpe golpe_antes = combo_golpe_atual(&c);
+
+            /* Sequência esperada: QUATRO com as posições trocadas. */
+            TipoGolpe esperado[4] = { QUATRO[0], QUATRO[1], QUATRO[2], QUATRO[3] };
+            int outra = (pos_troca + 1) % 4;
+            esperado[pos_troca] = QUATRO[outra];
+            esperado[outra] = QUATRO[pos_troca];
+
+            VERIFICA(combo_trocar_com_proximo(&c, pos_troca));
+            VERIFICA(sequencia_igual(&c, esperado, 4));
+            VERIFICA(c.atual == no_antes);
+            VERIFICA(combo_golpe_atual(&c) == golpe_antes);
+            VERIFICA(combo_consistente(&c));
+
+            /* Trocar de novo na mesma posição volta ao original. */
+            VERIFICA(combo_trocar_com_proximo(&c, pos_troca));
+            VERIFICA(sequencia_igual(&c, QUATRO, 4));
+            VERIFICA(combo_golpe_atual(&c) == golpe_antes);
+            VERIFICA(combo_consistente(&c));
+            combo_liberar(&c);
+        }
+    }
+}
+
+static void teste_trocar_dois_golpes(void)
+{
+    TESTE("trocar com 2 golpes inverte a ordem e mantem o atual");
+    for (int pos_troca = 0; pos_troca < 2; pos_troca++) {
+        Combo c;
+        montar(&c, QUATRO, 2);                        /* [E L] */
+        combo_avancar(&c);                            /* atual = L */
+        VERIFICA(combo_trocar_com_proximo(&c, pos_troca));
+        TipoGolpe esperado[2] = { GOLPE_LEVANTADOR, GOLPE_EMPURRAO };
+        VERIFICA(sequencia_igual(&c, esperado, 2));
+        VERIFICA(combo_golpe_atual(&c) == GOLPE_LEVANTADOR);
+        VERIFICA(combo_indice_atual(&c) == 0);        /* L foi para a posição 0 */
+        VERIFICA(combo_consistente(&c));
+        combo_liberar(&c);
+    }
 }
 
 static void teste_liberar_e_reusar(void)
@@ -395,6 +450,8 @@ int main(void)
     teste_remover_invalido();
     teste_trocar();
     teste_trocar_invalido();
+    teste_trocar_nao_muda_atual();
+    teste_trocar_dois_golpes();
     teste_liberar_e_reusar();
 
     printf("\n%d verificacoes, %d falhas\n", verificacoes, falhas);

@@ -11,11 +11,17 @@
  * Estável: com momentos de cura iguais, o hematoma mais novo fica DEPOIS
  * dos que já estavam lá.
  *
+ * Ponteiro para o fim: quase sempre o hematoma novo cura DEPOIS de todos
+ * (o golpe novo leva o mesmo tempo para curar que os anteriores, só que
+ * começa agora). Guardando o último nó, esse caso comum vira O(1): o novo
+ * é ligado direto depois do fim, sem percorrer a lista.
+ *
  * O tempo é sempre passado como parâmetro (relógio da partida, em segundos):
  * este módulo não chama GetTime(). Assim ele pode ser testado no terminal.
  *
  * Invariantes:
- *   - lista vazia: inicio == NULL, quantidade == 0, dano_total == 0
+ *   - lista vazia: inicio == NULL, fim == NULL, quantidade == 0, dano_total == 0
+ *   - lista não vazia: fim aponta para o último nó, e fim->prox == NULL
  *   - para todo nó x com x->prox != NULL:  x->momento_cura <= x->prox->momento_cura
  *   - quantidade == número de nós; dano_total == soma dos danos dos nós
  *   - quantidade <= HEMATOMAS_MAX
@@ -37,6 +43,7 @@ typedef struct NoHematoma {
 
 typedef struct {
     NoHematoma *inicio;          /* o que cura primeiro (NULL se vazia)     */
+    NoHematoma *fim;             /* último nó (NULL se vazia)               */
     int   quantidade;            /* número de hematomas ativos              */
     float dano_total;            /* soma dos danos, atualizada a cada
                                     inserção e remoção (não recalcular)     */
@@ -50,8 +57,9 @@ void hematomas_iniciar(ListaHematomas *l);
  * (insertion sort, estável). Atualiza quantidade e dano_total.
  * Retorna false (sem alterar nada) se: dano <= 0, a lista estiver cheia
  * (HEMATOMAS_MAX) ou faltar memória.
- * O(n) no pior caso; O(1) quando o novo cura antes de todos. */
-bool hematoma_inserir(ListaHematomas *l, float dano, double momento_cura);
+ * O(1) quando o novo cura depois de todos (o caso comum) ou antes de todos;
+ * O(n) no pior caso. */
+bool hematomas_inserir(ListaHematomas *l, float dano, double momento_cura);
 
 /* Remove e libera, a partir do início, todos os hematomas com
  * momento_cura <= agora. Atualiza quantidade e dano_total

@@ -60,10 +60,11 @@ bool combo_remover(Combo *c, int pos);
 
 /* Troca os golpes das posições pos e (pos + 1) % tamanho.
  * Com pos == tamanho-1, troca o último com o primeiro.
- * Ao final, atual = inicio (o combo foi reorganizado).
+ * Religa os ponteiros (os nós mudam de lugar; o golpe de cada nó não muda).
+ * Não muda atual: ele continua no mesmo nó, então combo_golpe_atual
+ * devolve o mesmo golpe de antes, mesmo que o atual seja um dos trocados.
  * Retorna false (sem alterar nada) se tamanho < 2 ou pos for inválida.
- * Pode trocar os valores dos nós ou religar os ponteiros; o resultado
- * visto de fora é o mesmo.  O(n) */
+ * O(n) para achar a posição; a religação em si é O(1). */
 bool combo_trocar_com_proximo(Combo *c, int pos);
 
 /* Golpe do nó atual. Devolve GOLPE_QTD se o combo estiver vazio.  O(1) */

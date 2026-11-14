@@ -47,7 +47,8 @@ Pontos que costumam dar errado:
 - **Remover o `inicio`** ou o **`atual`**: os dois ponteiros precisam andar para o próximo.
 - **Remover o último nó restante**: `inicio` e `atual` viram `NULL`, `tamanho` vira 0.
 - **Inserir não muda o `atual`**, exceto quando o combo estava vazio.
-- `combo_trocar_com_proximo` no último troca com o primeiro, e no fim faz `atual = inicio`.
+- `combo_trocar_com_proximo` no último troca com o primeiro. Ela religa os nós e **não mexe no
+  `atual`** (desde 2026-11-14; quem recomeça o combo depois de reorganizar é a tela de montagem).
 - Sempre `free` o nó removido. `combo_liberar` precisa funcionar com o combo vazio.
 - Retornar `false` **sem alterar nada** nos casos inválidos.
 
@@ -62,6 +63,8 @@ Implementar todas as funções de `src/hematoma.h`. Pontos que costumam dar erra
   `momento_cura` **maior** que o do novo e insira antes dele. Usar "maior" (e não
   "maior ou igual") é o que deixa a ordenação **estável**: empates ficam na ordem de chegada.
 - Inserir no **início** (lista vazia ou novo cura antes de todos) muda `l->inicio`.
+- **Ponteiro `fim`** (desde 2026-11-14): se o novo cura depois de todos (o caso comum), ligue
+  direto depois de `l->fim`, sem percorrer. Mantenha `fim` certo ao inserir, ao curar e ao liberar.
 - `dano_total` é **atualizado** a cada inserção e remoção (não recalcule somando tudo).
   Quando a lista ficar vazia, zere `dano_total` (evita resto de arredondamento de `float`).
 - `hematomas_curar` remove **só do início**, enquanto `momento_cura <= agora`.
