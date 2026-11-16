@@ -37,7 +37,7 @@ typedef struct {
     Combo *combo;                 /* do Jogador; NÃO é liberado aqui           */
     ListaHematomas hematomas;     /* criada e liberada pelo lutador            */
     float stamina;                /* 0 a STAMINA_MAX                     (pts) */
-    float tempo_desde_golpe;      /* para regenerar stamina e reiniciar combo (s) */
+    float tempo_desde_golpe;      /* para regenerar stamina (s) */
     EstadoLutador estado;
     bool  firmando;
     float golpe_pedido;           /* aperto do golpe guardado: quanto tempo ele
@@ -77,7 +77,7 @@ bool  lutador_comandar(Lutador *l, const Intencao *in, Vector3 posicao_adversari
 void  lutador_passo_fisica(Lutador *l);
 
 /* UMA vez por quadro, depois da física: stamina, hematomas_curar(relogio),
- * fim do golpe, reinício do combo parado (COMBO_TEMPO_REINICIO), queda. */
+ * fim do golpe, queda. */
 void  lutador_atualizar(Lutador *l, float dt, double relogio);
 
 bool  lutador_pode_golpear(const Lutador *l);  /* estado, stamina e não estar

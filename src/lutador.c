@@ -27,6 +27,23 @@ static void animar_golpe(Lutador *l)
 {
     Pose delta;
     golpe_amostrar(l->golpe_atual, l->tempo_golpe, &delta);
+    if (l->golpe_atual == golpe_dados(GOLPE_LEVANTADOR)) {
+        /* A curva sai da guarda de cada personagem e converge para a
+         * mesma pose absoluta no alto. */
+        const EstiloMovimento *e = &l->corpo.personagem->estilo;
+        float peso = Clamp(fminf(l->tempo_golpe, l->golpe_atual->duracao - l->tempo_golpe) / 0.16f, 0, 1);
+        for (int lado = 0; lado < 2; lado++) {
+            Articulacao a = lado ? ART_OMBRO_D : ART_OMBRO_E;
+            delta.alvo[a][0] += peso * (-1.0f - e->guarda_ombro);
+            delta.alvo[a][1] += peso * (0.50f - e->guarda_frente);
+            /* Compensa a inclinacao do tronco e o peso durante a sustentacao. */
+            if (l->tempo_golpe >= 0.50f && l->tempo_golpe <= 2.50f) {
+                Matrix braco = corpo_transformacao(&l->corpo, lado ? PARTE_BRACO_D : PARTE_BRACO_E);
+                float altura = asinf(Clamp(lado ? -braco.m1 : braco.m1, -1, 1));
+                delta.alvo[a][1] += Clamp(1.2f * (30.0f * DEG2RAD - altura),-0.16f, 0.16f);
+            }
+        }
+    }
     corpo_definir_movimento_extra(&l->corpo, &delta);
 }
 
@@ -44,7 +61,7 @@ bool lutador_criar(Lutador *l, Fisica *f, int indice, const Personagem *p,
     l->combo = combo;
     hematomas_iniciar(&l->hematomas);
     l->stamina = STAMINA_MAX;
-    l->tempo_desde_golpe = COMBO_TEMPO_REINICIO;
+    l->tempo_desde_golpe = STAMINA_ESPERA;
     l->estado = LUTADOR_NORMAL;
     combo_reiniciar(combo);
     return corpo_criar(&l->corpo, f, p, indice, posicao, angulo_y);
@@ -173,6 +190,10 @@ void lutador_passo_fisica(Lutador *l)
 static void atualizar_golpe(Lutador *l, float dt)
 {
     const Golpe *g = l->golpe_atual;
+    /* No segundo apoio do Empurrao a perna de tras impulsiona o corpo. */
+    if (g == golpe_dados(GOLPE_EMPURRAO) && l->tempo_golpe < 0.43f &&
+        l->tempo_golpe + dt >= 0.43f && l->corpo.apoio > PASSO_APOIO_MINIMO)
+        corpo_impulso(&l->corpo, Vector3Scale(corpo_frente(&l->corpo), 0.60f * g->avanco));
     l->tempo_golpe += dt;
     animar_golpe(l);
 
@@ -185,11 +206,23 @@ static void atualizar_golpe(Lutador *l, float dt)
             corpo_definir_rigidez(&l->corpo, RIGIDEZ_ATIVO);
             if (g->avanco != 0.0f) {
                 Vector3 frente = corpo_frente(&l->corpo);
-                corpo_impulso(&l->corpo, Vector3Scale(frente, g->avanco));
+                Vector3 impulso = Vector3Scale(frente, g->avanco);
+                if (g == golpe_dados(GOLPE_BARRIGADA)) {
+                    const bool *chao = l->corpo.fisica->no_chao[l->indice];
+                    if (!chao[PARTE_PE_E] && !chao[PARTE_PE_D])
+                        break;
+                    /* Mesma velocidade vertical para lutadores de massas diferentes. */
+                    float massa = 0;
+                    for (int i = 0; i < PARTE_QTD; i++) massa += l->personagem->massa[i];
+                    impulso.y = massa * 2.05f;
+                }
+                corpo_impulso(&l->corpo, impulso);
             }
         }
         break;
     case FASE_VOLTA:
+        if (g == golpe_dados(GOLPE_LEVANTADOR) && l->tempo_golpe < 2.52f)
+            break; /* sustenta a carga com os ombros firmes ate iniciar a descida */
         if (!l->voltou) {
             l->voltou = true;
             corpo_definir_rigidez(&l->corpo, RIGIDEZ_VOLTA);
@@ -227,9 +260,6 @@ void lutador_atualizar(Lutador *l, float dt, double relogio)
      * mais mole e fácil de derrubar. */
     corpo_definir_forca_muscular(&l->corpo,
                                  Lerp(CANSACO_FORCA_MINIMA, 1.0f, l->stamina / STAMINA_MAX));
-
-    if (l->tempo_desde_golpe >= COMBO_TEMPO_REINICIO && l->estado == LUTADOR_NORMAL)
-        combo_reiniciar(l->combo);
 
     if (!fora_de_combate(l)) {
         if (corpo_caido(&l->corpo)) {

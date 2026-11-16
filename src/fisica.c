@@ -82,6 +82,7 @@ static void ao_aproximar(void *dados, dGeomID g1, dGeomID g2)
             pe_no_chao = (r1->lutador >= 0) ? b1 : b2;
     }
 
+    const RefPeca *apoio = r1->lutador >= 0 ? r1 : r2;
     for (int i = 0; i < n; i++) {
         /* Approx1: mu passa a ser o coeficiente de atrito (sem ele, mu é força). */
         pontos[i].surface.mode = dContactApprox1 | dContactSoftERP | dContactSoftCFM;
@@ -93,6 +94,7 @@ static void ao_aproximar(void *dados, dGeomID g1, dGeomID g2)
                                 pontos[i].geom.pos[2], local);
             if (local[2] > 0.0)
                 pontos[i].surface.mu = FISICA_ATRITO_PONTA;
+            pontos[i].surface.mu += MARCHA_ADERENCIA * apoio->apoio_marcha;
         }
         pontos[i].surface.soft_erp = entre_lutadores ? ERP_LUTADORES : ERP_CONTATO;
         pontos[i].surface.soft_cfm = CFM_CONTATO;

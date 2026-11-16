@@ -253,8 +253,100 @@ static int janela(bool capturas, const int personagens[2])
     return 0;
 }
 
+static int testar_levantador(int atacante, bool capturar)
+{
+    Jogador jogadores[2] = {0};
+    Partida p;
+    fisica_iniciar_biblioteca();
+    for (int i = 0; i < 2; i++) {
+        jogadores[i].personagem = i ? 1 - atacante : atacante;
+        combo_iniciar(&jogadores[i].combo);
+        combo_inserir(&jogadores[i].combo, 0, GOLPE_LEVANTADOR);
+    }
+    if (!partida_iniciar(&p, jogadores)) return 1;
+    Recursos recursos = {0};
+    CameraLuta camera;
+    int capturas = 0;
+    const float tempos[] = {0.06f, 0.23f, 0.36f, 1.45f};
+    if (capturar) {
+        SetConfigFlags(FLAG_WINDOW_HIDDEN);
+        InitWindow(640, 480, "Perfil do Levantador");
+        recursos_carregar(&recursos);
+        render_iniciar_camera(&camera);
+    }
+    Robo robo = {0};
+    int amostras = 0, no_ar = 0;
+    float abertura_subida = 0;
+    int quadros_subida = 0;
+    float elevacao[2] = {0}, desvio[2] = {0};
+    for (int i = 0; i < 3600 && p.estado != PARTIDA_FIM; i++) {
+        Lutador *l = &p.lutadores[0];
+        Intencao in[2] = {entrada_vazia(), entrada_vazia()};
+        in[0] = robo_pensar(&robo, l, &p.lutadores[1], 1.0f/60);
+        if (l->golpe_acertou && l->estado == LUTADOR_GOLPEANDO) in[0].mover = (Vector2){0};
+        partida_atualizar(&p, in, 1.0f/60);
+        if (p.estado == PARTIDA_LUTA && l->estado == LUTADOR_GOLPEANDO &&
+            l->tempo_golpe >= 0.18f && l->tempo_golpe <= 0.48f) {
+            Matrix tronco = corpo_transformacao(&l->corpo, PARTE_TRONCO);
+            Vector3 lateral = {tronco.m0, tronco.m1, tronco.m2};
+            for (int k = 0; k < 2; k++) {
+                Matrix m = corpo_transformacao(&l->corpo, k ? PARTE_BRACO_D : PARTE_BRACO_E);
+                float fora = fabsf(Vector3DotProduct((Vector3){m.m0,m.m1,m.m2}, lateral));
+                abertura_subida += asinf(Clamp(fora, 0, 1)) * RAD2DEG;
+                quadros_subida++;
+            }
+        }
+        if (capturar && capturas < 4 && l->estado == LUTADOR_GOLPEANDO &&
+            l->tempo_golpe >= tempos[capturas] && (capturas < 3 || l->golpe_acertou)) {
+            Vector3 centro = corpo_posicao(&l->corpo);
+            Vector3 f = corpo_frente(&l->corpo);
+            camera.camera.target = Vector3Add(centro, (Vector3){0.2f*f.x, 0.40f, 0.2f*f.z});
+            camera.camera.position = Vector3Add(camera.camera.target, (Vector3){2.8f*f.z, 0.2f, -2.8f*f.x});
+            RenderTexture2D quadro = LoadRenderTexture(640, 480);
+            BeginTextureMode(quadro);
+            ClearBackground(DARKGRAY);
+            render_cena(&p, &recursos, &camera, false);
+            EndTextureMode();
+            Image imagem = LoadImageFromTexture(quadro.texture);
+            ImageFlipVertical(&imagem);
+            ExportImage(imagem, TextFormat("levantador_perfil_%d.png", ++capturas));
+            UnloadImage(imagem);
+            UnloadRenderTexture(quadro);
+        }
+        if (p.estado != PARTIDA_LUTA || l->estado != LUTADOR_GOLPEANDO || !l->golpe_acertou ||
+            l->tempo_golpe < 0.65f || l->tempo_golpe > 2.50f) continue;
+        const bool *chao = p.fisica.no_chao[1];
+        no_ar += !chao[PARTE_PE_E] && !chao[PARTE_PE_D];
+        for (int k = 0; k < 2; k++) {
+            Matrix m = corpo_transformacao(&l->corpo, k ? PARTE_BRACO_D : PARTE_BRACO_E);
+            Matrix tronco = corpo_transformacao(&l->corpo, PARTE_TRONCO);
+            Vector3 braco = Vector3Scale((Vector3){m.m0, m.m1, m.m2}, k ? -1 : 1);
+            Vector3 frente = {tronco.m8, tronco.m9, tronco.m10};
+            Vector3 lado = {tronco.m0, tronco.m1, tronco.m2};
+            desvio[k] += atan2f(fabsf(Vector3DotProduct(braco, lado)),
+                                Vector3DotProduct(braco, frente)) * RAD2DEG;
+            elevacao[k] += asinf(Clamp(k ? -m.m1 : m.m1, -1, 1)) * RAD2DEG;
+        }
+        if (++amostras >= 100) break;
+    }
+    printf("Levantador: %d/%d quadros com alvo no ar; elevacao media E/D %.1f/%.1f graus\n",
+           no_ar, amostras, elevacao[0]/fmaxf(1,amostras), elevacao[1]/fmaxf(1,amostras));
+    printf("Abertura media durante a subida: %.1f graus\n", abertura_subida/fmaxf(1,quadros_subida));
+    if (capturar) { recursos_liberar(&recursos); CloseWindow(); }
+    printf("Desvio da frente E/D: %.1f/%.1f graus\n", desvio[0]/fmaxf(1,amostras), desvio[1]/fmaxf(1,amostras));
+    partida_liberar(&p);
+    for (int i = 0; i < 2; i++) combo_liberar(&jogadores[i].combo);
+    fisica_finalizar_biblioteca();
+    return amostras < 100 || no_ar < 90 ||
+           quadros_subida == 0 || abertura_subida / quadros_subida > 10.0f ||
+           desvio[0] / amostras > 10.0f || desvio[1] / amostras > 10.0f ||
+           fabsf(elevacao[0] / amostras - 45.0f) > 5.0f ||
+           fabsf(elevacao[1] / amostras - 45.0f) > 5.0f;
+}
+
 int main(int argc, char **argv)
 {
+    if (argc > 1 && strcmp(argv[1], "--levantador") == 0) return testar_levantador(argc > 2 && strcmp(argv[2], "tai") == 0, argc > 3 && strcmp(argv[3], "--capturas") == 0);
     if (argc > 1 && strcmp(argv[1], "--teste") == 0)
         return verificar();
 

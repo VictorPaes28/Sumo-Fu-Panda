@@ -120,7 +120,31 @@ static int verificar(void)
     cena_simular(&cena, 1.0f);
     Vector3 antes = corpo_posicao(&cena.corpos[0]);
     corpo_definir_movimento(&cena.corpos[0], (Vector2){ 0, 1 }, 1.0f);   /* para +Z */
-    cena_simular(&cena, 2.0f);
+    int apoio_unico[2] = {0};
+    float arrasto = 0.0f;
+    int contatos = 0;
+    for (int i = 0; i < (int)(2.0f / FISICA_DT); i++) {
+        Vector3 antes_pe[2];
+        for (int k = 0; k < 2; k++) {
+            Matrix m = corpo_transformacao(&cena.corpos[0], k ? PARTE_PE_D : PARTE_PE_E);
+            antes_pe[k] = (Vector3){ m.m12, 0, m.m14 };
+        }
+        cena_passo(&cena);
+        const bool *chao = cena.fisica.no_chao[0];
+        for (int k = 0; k < 2; k++) {
+            ParteCorpo pe = k ? PARTE_PE_D : PARTE_PE_E;
+            if (!chao[pe]) continue;
+            apoio_unico[k] += !chao[k ? PARTE_PE_E : PARTE_PE_D];
+            Matrix m = corpo_transformacao(&cena.corpos[0], pe);
+            arrasto += Vector3Distance(antes_pe[k], (Vector3){ m.m12, 0, m.m14 });
+            contatos++;
+        }
+    }
+    printf("Andar: apoio exclusivo E/D = %d/%d passos de fisica; velocidade media do pe apoiado %.3f m/s\n",
+           apoio_unico[0], apoio_unico[1], arrasto / (FISICA_DT * fmaxf(1, contatos)));
+    confere(apoio_unico[0] > 10 && apoio_unico[1] > 10 &&
+            arrasto < contatos * FISICA_DT * 0.55f,
+            "caminhada alterna os apoios e limita o arrasto", "caminhada lateral de 2 s");
     Vector3 depois = corpo_posicao(&cena.corpos[0]);
     snprintf(d, sizeof d, "andou %.2f m em Z em 2 s; caido=%d", depois.z - antes.z,
              corpo_caido(&cena.corpos[0]));

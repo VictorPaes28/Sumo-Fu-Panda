@@ -89,16 +89,16 @@ static void desenhar_lado(const TelaMontagem *t, int i, const Combo *combo)
     /* Catálogo. */
     for (int g = 0; g < GOLPE_QTD; g++) {
         const Golpe *d = golpe_dados((TipoGolpe)g);
-        float y = 175.0f + g * 46.0f;
+        float y = 175.0f + g * 21.0f;
         bool sel = (g == t->cursor_catalogo[i]);
         if (sel)
-            DrawRectangleRec((Rectangle){ x + 20, y - 4, w - 40, 40 }, Fade(cor, 0.25f));
-        DrawText(d->nome, (int)x + 36, (int)y + 4, 24, sel ? UI_TEXTO : UI_TEXTO_FRACO);
+            DrawRectangleRec((Rectangle){ x + 20, y - 2, w - 40, 20 }, Fade(cor, 0.25f));
+        DrawText(d->nome, (int)x + 36, (int)y, 18, sel ? UI_TEXTO : UI_TEXTO_FRACO);
         DrawText(TextFormat("dano %.0f%%  stamina %.0f", d->dano, d->custo_stamina),
-                 (int)(x + w) - 250, (int)y + 8, 18, sel ? UI_DESTAQUE : UI_TEXTO_FRACO);
+                 (int)(x + w) - 250, (int)y + 1, 15, sel ? UI_DESTAQUE : UI_TEXTO_FRACO);
     }
     const Golpe *sel = golpe_dados((TipoGolpe)t->cursor_catalogo[i]);
-    ui_texto_centro(sel->descricao, cx, 412, 20, UI_TEXTO);
+    ui_texto_centro(sel->descricao, cx, 420, 16, UI_TEXTO);
 
     /* Espaços do combo. */
     float sw = (w - 60.0f) / COMBO_MAX;
@@ -109,7 +109,7 @@ static void desenhar_lado(const TelaMontagem *t, int i, const Combo *combo)
         DrawText(TextFormat("%d", k + 1), (int)r.x + 6, (int)r.y + 4, 16, UI_TEXTO_FRACO);
         TipoGolpe gk = combo_golpe_em(combo, k);
         if (gk != GOLPE_QTD)
-            ui_texto_centro(golpe_dados(gk)->nome, (int)(r.x + r.width / 2), (int)r.y + 30, 18, UI_TEXTO);
+            ui_texto_centro(golpe_dados(gk)->nome, (int)(r.x + r.width / 2), (int)r.y + 30, 12, UI_TEXTO);
         if (k < COMBO_MAX - 1)
             DrawText(">", (int)(r.x + r.width + 1), (int)r.y + 26, 16, UI_TEXTO_FRACO);
     }

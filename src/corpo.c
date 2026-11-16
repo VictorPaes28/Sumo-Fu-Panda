@@ -12,6 +12,7 @@
  */
 #include <math.h>
 #include "corpo.h"
+#include "tapa_lateral.h"
 #include "config.h"
 #include "raymath.h"
 #include "animacao.h"
@@ -31,8 +32,8 @@ typedef struct {
 static const LimiteArticulacao LIMITES[ART_QTD] = {
     [ART_CINTURA]   = { { -0.50f, -0.40f }, { 0.80f, 0.40f }, 2.5f, 1.5f },
     [ART_PESCOCO]   = { { -0.50f, -0.40f }, { 0.50f, 0.40f }, 0.3f, 1.8f },
-    [ART_OMBRO_E]   = { { -1.40f, -0.80f }, { 1.20f, 1.45f }, 0.5f, 1.0f },
-    [ART_OMBRO_D]   = { { -1.40f, -0.80f }, { 1.20f, 1.45f }, 0.5f, 1.0f },
+    [ART_OMBRO_E]   = { { -1.58f, -0.80f }, { 1.66f, 2.78f }, 0.5f, 1.0f },
+    [ART_OMBRO_D]   = { { -1.58f, -0.80f }, { 1.66f, 2.78f }, 0.5f, 1.0f },
     [ART_QUADRIL_E] = { { -0.80f, -0.30f }, { 1.40f, 0.70f }, 2.0f, 0.3f },
     [ART_QUADRIL_D] = { { -0.80f, -0.30f }, { 1.40f, 0.70f }, 2.0f, 0.3f },
     [ART_JOELHO_E]  = { {  0.00f,  0.00f }, { 2.20f, 0.00f }, 2.0f, 0.3f },
@@ -360,7 +361,13 @@ static void animar(Corpo *c, Pose *alvo)
     float ritmo = Clamp(Vector2Length(vel) / fmaxf(c->personagem->velocidade_max, 0.1f), 0.0f, 1.3f);
     float comando = Vector2Length(c->direcao_andar);
     /* Deslizando de verdade (ritmo > 0.25) ou andando: dá passos. Parado, não. */
+    c->refs[PARTE_PE_E].apoio_marcha = 0.0f;
+    c->refs[PARTE_PE_D].apoio_marcha = 0.0f;
     float intensidade = fmaxf(ritmo > 0.25f ? ritmo : 0.0f, comando > 0.1f ? fmaxf(ritmo, 0.35f) : 0.0f);
+    bool marcha = comando > 0.1f && !c->tem_extra && c->passo_perna < 0
+               && c->equilibrio > 0.0f;
+    if (marcha)
+        intensidade = fmaxf(intensidade, comando * c->fator_velocidade);
     if (intensidade < 0.08f)
         return;
 
@@ -387,6 +394,32 @@ static void animar(Corpo *c, Pose *alvo)
     for (int lado = 0; lado < 2; lado++) {
         Articulacao quadril = lado ? ART_QUADRIL_D : ART_QUADRIL_E;
         Articulacao joelho = lado ? ART_JOELHO_D : ART_JOELHO_E;
+        if (marcha) {
+            float fase = 2.0f * PI * c->tempo_passo / duracao + lado * PI;
+            float sobe = fmaxf(0.0f, sinf(fase));
+            float alcance = -cosf(fase) * pernas;
+            float lateral = Vector2DotProduct(dir, esquerda) * (lado ? -1.0f : 1.0f);
+            alvo->alvo[quadril][0] += alcance * para_frente + sobe * pernas * 0.55f;
+            alvo->alvo[quadril][1] += 0.35f * alcance * lateral;
+            alvo->alvo[joelho][0] += sobe * pernas * 1.3f;
+            ParteCorpo pe = lado ? PARTE_PE_D : PARTE_PE_E;
+            ParteCorpo apoio = lado ? PARTE_PE_E : PARTE_PE_D;
+            c->refs[pe].apoio_marcha = (0.35f + 0.65f * fmaxf(0.0f, -sinf(fase))) * peso;
+            if (lado == 0) {
+                /* Controla a diferenca de altura: enquanto um pe avanca,
+                 * o outro desce para receber o peso. */
+                dBodyID livre = c->pecas[pe], outro = c->pecas[apoio];
+                float altura = dBodyGetPosition(livre)[1] - dBodyGetPosition(outro)[1];
+                float vel_y = dBodyGetLinearVel(livre)[1] - dBodyGetLinearVel(outro)[1];
+                float alvo_y = MARCHA_ALTURA * sinf(fase) * peso;
+                float massa = c->personagem->massa[PARTE_BACIA];
+                float carga = massa * Clamp(MARCHA_MOLA * (alvo_y - altura) -
+                                            MARCHA_AMORTECIMENTO * vel_y, -42.0f, 42.0f);
+                dBodyAddForce(livre, 0, carga, 0);
+                dBodyAddForce(outro, 0, -carga, 0);
+            }
+            continue;
+        }
         float passo = var.alvo[quadril][0];
         alvo->alvo[quadril][0] += passo * para_frente * pernas;
         alvo->alvo[quadril][1] += passo * de_lado * 0.8f * pernas;   /* passo lateral */
@@ -750,7 +783,15 @@ static void comecar_passo(Corpo *c)
     Vector2 capture = Vector2Add(meio_dos_pes(c), c->desequilibrio);
     Vector2 q = direcao_da_queda(c);
     int perna;
-    if (fabsf(q.y) > 0.5f) {
+    /* Com um unico apoio, a perna livre busca o ponto de equilibrio.
+     * Erguer o ultimo pe apoiado faria o lutador perder a base. */
+    const bool *chao = c->fisica->no_chao[c->refs[0].lutador];
+    bool pe_e = chao[PARTE_PE_E], pe_d = chao[PARTE_PE_D];
+    if (!pe_e && !pe_d)
+        return;
+    if (pe_e != pe_d) {
+        perna = pe_e ? 1 : 0;
+    } else if (fabsf(q.y) > 0.5f) {
         perna = (q.y > 0.0f) ? 0 : 1;
     } else {
         float de = Vector2Distance(posicao_no_chao(c->pecas[PARTE_PE_E]), capture);
@@ -855,9 +896,14 @@ static void andar(Corpo *c)
         f = Vector2Scale(f, forca / tam);
     /* Metade na bacia e metade nos pés: andar é empurrar o chão com os pés.
      * Toda a força na bacia, com os pés presos pelo atrito, tombaria o corpo. */
+    float apoio_e = c->refs[PARTE_PE_E].apoio_marcha;
+    float apoio_d = c->refs[PARTE_PE_D].apoio_marcha;
+    float transferencia = Clamp(apoio_d - apoio_e, -0.5f, 0.5f);
+    float esquerda = 0.25f + 0.5f * transferencia;
+    float direita = 0.5f - esquerda;
     dBodyAddForce(bacia, f.x * 0.5f, 0, f.y * 0.5f);
-    dBodyAddForce(c->pecas[PARTE_CANELA_E], f.x * 0.25f, 0, f.y * 0.25f);
-    dBodyAddForce(c->pecas[PARTE_CANELA_D], f.x * 0.25f, 0, f.y * 0.25f);
+    dBodyAddForce(c->pecas[PARTE_CANELA_E], f.x * esquerda, 0, f.y * esquerda);
+    dBodyAddForce(c->pecas[PARTE_CANELA_D], f.x * direita, 0, f.y * direita);
 }
 
 void corpo_passo(Corpo *c)
@@ -931,6 +977,69 @@ void corpo_impulso(Corpo *c, Vector3 impulso)
     for (int i = 0; i < PARTE_QTD; i++) {
         const dReal *v = dBodyGetLinearVel(c->pecas[i]);
         dBodySetLinearVel(c->pecas[i], v[0] + dv.x, v[1] + dv.y, v[2] + dv.z);
+    }
+}
+
+void corpo_guiar_tapa(Corpo *c, const Corpo *oponente, float arco, float peso)
+{
+    Vector3 base = corpo_posicao(c);
+    Matrix cabeca = corpo_transformacao(oponente, PARTE_CABECA);
+    Vector3 rosto = { cabeca.m12, cabeca.m13, cabeca.m14 };
+    Vector3 linha = { rosto.x - base.x, 0, rosto.z - base.z };
+    if (Vector3Length(linha) < 0.05f) return;
+    Vector3 frente = Vector3Normalize(linha);
+    float giro = -30.0f * DEG2RAD * arco * peso;
+    Vector3 rumo = Vector3RotateByAxisAngle(frente, (Vector3){0, 1, 0}, giro);
+    /* O chao resiste ao giro. Cada pe e a bacia miram o mesmo rumo,
+     * freando conforme chegam ao angulo em vez de rodar por impulso. */
+    const ParteCorpo partes[] = { PARTE_BACIA, PARTE_PE_E, PARTE_PE_D };
+    for (int i = 0; i < 3; i++) {
+        dBodyID b = c->pecas[partes[i]];
+        Vector3 eixo = eixo_da_peca(b, 2);
+        float erro = atan2f(eixo.z * rumo.x - eixo.x * rumo.z, eixo.x * rumo.x + eixo.z * rumo.z);
+        float velocidade = (float)dBodyGetAngularVel(b)[1];
+        float torque = (i == 0 ? 1600.0f : 150.0f) * erro - (i == 0 ? 85.0f : 9.0f) * velocidade;
+        float limite = i == 0 ? 300.0f : 35.0f;
+        dBodyAddTorque(b, 0, Clamp(torque, -limite, limite) * c->apoio * peso, 0);
+    }
+
+    /* Fecha o arco da mao sobre o rosto. Fora de alcance, termina o
+     * gesto no ar. A forca limitada permite que a guarda bloqueie a mao. */
+    const Personagem *p = c->personagem;
+    float alcance = p->tamanho[PARTE_BRACO_E][0] + p->tamanho[PARTE_ANTEBRACO_E][0];
+    Vector3 alvo = Vector3Add(base, Vector3Scale(frente, fminf(Vector3Length(linha), alcance)));
+    alvo.y = rosto.y;
+    Matrix antebraco = corpo_transformacao(c, PARTE_ANTEBRACO_E);
+    Vector3 mao = Vector3Transform((Vector3){p->tamanho[PARTE_ANTEBRACO_E][0] * 0.5f, 0, 0}, antebraco);
+    dBodyID braco = c->pecas[PARTE_ANTEBRACO_E];
+    dVector3 v;
+    dBodyGetPointVel(braco, mao.x, mao.y, mao.z, v);
+    Vector3 relativa = Vector3Subtract(vetor_ode(v), vetor_ode(dBodyGetLinearVel(c->pecas[PARTE_BACIA])));
+    Vector3 erro_mao = Vector3Subtract(alvo, mao);
+    /* A mao precisa subir mais contra um lutador alto. Prioriza a altura
+     * mesmo quando falta alcance para tocar o rosto. */
+    erro_mao.y *= 2.8f;
+    Vector3 forca = Vector3Subtract(Vector3Scale(erro_mao, 950.0f),
+                                    Vector3Scale(relativa, 38.0f));
+    forca = Vector3Scale(Vector3ClampValue(forca, 0, 265.0f), arco * arco * peso);
+    dBodyAddForceAtPos(braco, forca.x, forca.y, forca.z, mao.x, mao.y, mao.z);
+}
+
+void corpo_sustentar(const Corpo *c, Corpo *outro)
+{
+    Vector3 frente = corpo_frente(c);
+    Vector3 onde = Vector3Add(corpo_posicao(c), Vector3Scale(frente, 0.70f));
+    onde.y += 0.42f + outro->personagem->centro[PARTE_BACIA][1]
+                    - c->personagem->centro[PARTE_BACIA][1];
+    Vector3 erro = Vector3Subtract(onde, corpo_posicao(outro));
+    Vector3 vel = vetor_ode(dBodyGetLinearVel(outro->pecas[PARTE_BACIA]));
+    Vector3 relativa = Vector3Subtract(vel, vetor_ode(dBodyGetLinearVel(c->pecas[PARTE_BACIA])));
+    Vector3 acel = Vector3Subtract(Vector3Scale(erro, 55.0f), Vector3Scale(relativa, 12.0f));
+    acel.y -= FISICA_GRAVIDADE;
+    acel = Vector3ClampValue(acel, 0.0f, 32.0f);
+    for (int i = 0; i < PARTE_QTD; i++) {
+        Vector3 f = Vector3Scale(acel, outro->personagem->massa[i]);
+        dBodyAddForce(outro->pecas[i], f.x, f.y, f.z);
     }
 }
 

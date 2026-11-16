@@ -6,6 +6,7 @@
  */
 #include <math.h>
 #include "partida.h"
+#include "tapa_lateral.h"
 #include "config.h"
 #include "personagem.h"
 #include "raymath.h"
@@ -74,6 +75,21 @@ static void simular(Partida *p, float dt)
     while (p->acumulador >= FISICA_DT && passos < FISICA_MAX_PASSOS_POR_QUADRO) {
         lutador_passo_fisica(&p->lutadores[0]);     /* forças reaplicadas a cada passo */
         lutador_passo_fisica(&p->lutadores[1]);
+        for (int i = 0; lutando && i < 2; i++) {
+            Lutador *l = &p->lutadores[i];
+            if (l->estado == LUTADOR_GOLPEANDO && l->golpe_atual == golpe_dados(GOLPE_TAPA_LATERAL)) {
+                const Golpe *g = l->golpe_atual;
+                float t = l->tempo_golpe - g->tempo_preparo;
+                if (t >= 0.0f) {
+                    float arco = Clamp(t / 0.21f, 0, 1);
+                    float peso = Clamp((g->duracao - l->tempo_golpe) / 0.20f, 0, 1);
+                    corpo_guiar_tapa(&l->corpo, &p->lutadores[1-i].corpo, arco, peso);
+                }
+            }
+            if (l->estado == LUTADOR_GOLPEANDO && l->golpe_acertou &&
+                l->golpe_atual == golpe_dados(GOLPE_LEVANTADOR) && l->tempo_golpe <= 2.50f)
+                corpo_sustentar(&l->corpo, &p->lutadores[1 - i].corpo);
+        }
         fisica_passo(&p->fisica);
         for (int i = 0; i < 2; i++) {
             const Lutador *l = &p->lutadores[i];

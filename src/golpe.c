@@ -72,69 +72,63 @@ static const ChaveGolpe CHAVES_EMPURRAO[] = {
     CHAVE(0.32f, -0.45f, 0.90f, [ART_CINTURA] = { 0.18f, -0.05f },
           [ART_OMBRO_E] = { 0.90f, 0.88f }, [ART_OMBRO_D] = { 0.10f, 0.45f },
           PERNA_E(0.42f, 0.25f), PERNA_D(0.02f, 0.06f)),
-    CHAVE(0.40f, 0.30f, 0.30f, [ART_CINTURA] = { 0.12f, 0.0f }, BRACOS(0.40f, 0.60f),
-          PERNAS(0.15f, 0.15f)),
-    CHAVE(0.50f, 0.0f, 0.0f, [ART_CINTURA] = { 0.0f, 0.0f }),
+    /* Terceira passada: recolhe o joelho direito, pisa e termina com as palmas. */
+    CHAVE(0.43f, -0.38f, 0.25f, BRACOS(0.75f, 0.75f),
+          PERNA_D(0.66f, 0.80f), PERNA_E(-0.12f, -0.12f)),
+    CHAVE(0.56f, -0.72f, -0.72f, BRACOS(1.05f, 1.02f),
+          PERNA_D(0.48f, 0.12f), PERNA_E(-0.18f, -0.15f), PES(-0.12f)),
+    CHAVE(0.65f, -0.72f, -0.72f, BRACOS(1.05f, 1.02f),
+          PERNA_D(0.42f, 0.10f), PERNA_E(-0.12f, -0.10f)),
+    CHAVE(0.85f, 0.0f, 0.0f, [ART_CINTURA] = { 0.0f, 0.0f }),
 };
 
-/* Levantador = hazu-oshi: a mão em "forquilha" (entre o polegar e o
- * indicador) por baixo das axilas do outro, empurrando PARA CIMA.
- *   0,14  afunda fundo, tronco curvado, mãos baixas com os cotovelos
- *         dobrados e fechados (as mãos sobem até a altura das axilas dele);
- *   0,24  as pernas esticam e os braços sobem e avançam: o tronco fica de
- *         pé, sem jogar para trás (quem ergue é a perna), queixo no peito;
- *   0,36  passa do ponto, braços quase retos; 0,62 guarda. */
+/* Hazu-oshi: entra por baixo, estende os joelhos e sustenta a pose alta. */
+/* Flexao frontal: fecha os cotovelos e mantem o primeiro eixo baixo.
+ * A subida vem do segundo eixo: a mao passa pela frente e continua acima
+ * da horizontal. Valores relativos a guarda de referencia (-1, 0.5). */
+#define LEVANTADOR_ALTO(t) CHAVE(t, -0.52f, -0.52f, BRACOS(-0.55f, 1.80f), PERNAS(-0.08f, -0.10f))
 static const ChaveGolpe CHAVES_LEVANTADOR[] = {
-    CHAVE(0.00f, 0.0f, 0.0f, [ART_CINTURA] = { 0.0f, 0.0f }),
-    CHAVE(0.14f, 0.95f, 0.95f, [ART_CINTURA] = { 0.26f, 0.0f }, [ART_PESCOCO] = { 0.15f, 0.0f },
-          BRACOS(-0.05f, 0.25f), PERNAS(0.35f, 0.35f)),
-    CHAVE(0.24f, 0.05f, 0.05f, [ART_CINTURA] = { -0.04f, 0.0f }, [ART_PESCOCO] = { 0.10f, 0.0f },
-          BRACOS(0.60f, 0.75f), PERNAS(-0.10f, -0.20f), PES(-0.20f)),
-    CHAVE(0.36f, -0.15f, -0.15f, [ART_CINTURA] = { -0.06f, 0.0f }, [ART_PESCOCO] = { 0.05f, 0.0f },
-          BRACOS(0.70f, 0.80f), PERNAS(-0.05f, -0.15f)),
-    CHAVE(0.62f, 0.0f, 0.0f, [ART_CINTURA] = { 0.0f, 0.0f }),
+    CHAVE(0.00f, 0.0f, 0.0f, BRACOS(0, 0)),
+    CHAVE(0.16f, 0.54f, 0.54f, [ART_CINTURA] = { 0.18f, 0.0f },
+          BRACOS(-0.40f, 0.40f), PERNAS(0.34f, 0.34f)),
+    CHAVE(0.28f, 0.05f, 0.05f, BRACOS(-0.55f, 1.06f), PERNAS(0.10f, 0.10f)),
+    CHAVE(0.38f, -0.32f, -0.32f, BRACOS(-0.55f, 1.56f), PERNAS(0, 0)),
+    LEVANTADOR_ALTO(0.48f),
+    LEVANTADOR_ALTO(0.50f),
+    LEVANTADOR_ALTO(2.50f),
+    LEVANTADOR_ALTO(2.52f),
+    CHAVE(2.68f, 0.05f, 0.05f, BRACOS(-0.55f, 1.06f)),
+    CHAVE(2.85f, 0.0f, 0.0f, BRACOS(0, 0)),
 };
+#undef LEVANTADOR_ALTO
 
-/* Tapa lateral = harite: tapa de mão aberta na lateral do rosto, curto e
- * em chicote, com a mão ESQUERDA. A direita fica fechada na frente do peito,
- * protegendo.
- *   0,06  arma: o braço esquerdo vai para o lado e para trás, dobrado, e o
- *         peso carrega a perna esquerda;
- *   0,12  o tapa: o braço passa à frente na altura do rosto, quase reto, e o
- *         corpo passa o peso para a direita;
- *   0,19  continua cruzando à frente do corpo; 0,32 guarda. */
+/* Tapa: primeiro estende o esquerdo ao lado; depois varre na altura do rosto.
+ * A direita continua na guarda. O pe esquerdo avanca durante o giro. */
 static const ChaveGolpe CHAVES_TAPA_LATERAL[] = {
-    CHAVE(0.00f, 0.0f, 0.0f, [ART_CINTURA] = { 0.0f, 0.0f }),
-    CHAVE(0.06f, 1.10f, 0.95f, [ART_CINTURA] = { 0.04f, 0.10f },
-          [ART_OMBRO_E] = { 1.10f, -0.95f }, [ART_OMBRO_D] = { 0.25f, 0.40f },
-          PERNAS(0.10f, 0.10f)),
-    CHAVE(0.12f, -0.55f, 0.95f, [ART_CINTURA] = { 0.10f, -0.15f },
-          [ART_OMBRO_E] = { 1.20f, 0.80f }, [ART_OMBRO_D] = { 0.25f, 0.40f },
-          PERNA_E(0.05f, 0.00f), PERNA_D(0.12f, 0.12f)),
-    CHAVE(0.19f, -0.05f, 0.80f, [ART_CINTURA] = { 0.08f, -0.18f },
-          [ART_OMBRO_E] = { 0.95f, 1.05f }, [ART_OMBRO_D] = { 0.20f, 0.35f },
-          PERNAS(0.06f, 0.06f)),
-    CHAVE(0.32f, 0.0f, 0.0f, [ART_CINTURA] = { 0.0f, 0.0f }),
+    CHAVE(0.00f, 0, 0, [ART_OMBRO_E] = { 0, 0 }),
+    CHAVE(0.18f, -0.48f, 0, [ART_OMBRO_E] = { 1.12f, -0.52f }, PERNAS(0.08f, 0.08f)),
+    CHAVE(0.28f, -0.48f, 0, [ART_OMBRO_E] = { 1.12f, -0.52f }, PERNAS(0.08f, 0.08f)),
+    CHAVE(0.39f, -0.38f, 0, [ART_OMBRO_E] = { 1.55f, 0.24f },
+          PERNA_E(0.16f, 0.21f), PERNA_D(-0.08f, -0.03f)),
+    CHAVE(0.52f, -0.10f, 0, [ART_OMBRO_E] = { 2.05f, 0.50f },
+          [ART_CINTURA] = { -0.10f, -0.08f }, PERNA_E(0.19f, 0.11f), PERNA_D(-0.11f, -0.07f)),
+    CHAVE(0.69f, -0.10f, 0, [ART_OMBRO_E] = { 2.05f, 0.50f },
+          [ART_CINTURA] = { -0.10f, -0.08f }, PERNA_E(0.19f, 0.11f), PERNA_D(-0.11f, -0.07f)),
+    CHAVE(0.90f, 0, 0, [ART_OMBRO_E] = { 0, 0 }),
 };
 
-/* Barrigada = gaburi-yori: segura o outro pela cintura e o empurra com a
- * barriga, em dois "pulos" do quadril.
- *   0,12  afunda e abraça baixo (mãos na faixa dele, cotovelos dobrados),
- *         tronco curvado sobre ele;
- *   0,24  1º pulo: o quadril vai à frente e o tronco para trás (a barriga
- *         bate), os braços puxam o outro contra a barriga;
- *   0,34  recarrega afundando; 0,44 2º pulo, mais forte; 0,75 guarda. */
+/* Barrigada: abre os bracos ao agachar, salta de peito aberto e amortece a queda. */
 static const ChaveGolpe CHAVES_BARRIGADA[] = {
-    CHAVE(0.00f, 0.0f, 0.0f, [ART_CINTURA] = { 0.0f, 0.0f }),
-    CHAVE(0.12f, 0.85f, 0.85f, [ART_CINTURA] = { 0.16f, 0.0f }, BRACOS(0.30f, 0.45f),
-          PERNAS(0.25f, 0.25f)),
-    CHAVE(0.24f, 1.25f, 1.25f, [ART_CINTURA] = { -0.44f, 0.0f }, [ART_PESCOCO] = { 0.10f, 0.0f },
-          BRACOS(0.25f, 0.35f), PERNAS(-0.20f, -0.05f), PES(-0.15f)),
-    CHAVE(0.34f, 0.95f, 0.95f, [ART_CINTURA] = { -0.05f, 0.0f }, BRACOS(0.28f, 0.40f),
-          PERNAS(0.15f, 0.15f)),
-    CHAVE(0.44f, 1.25f, 1.25f, [ART_CINTURA] = { -0.50f, 0.0f }, [ART_PESCOCO] = { 0.12f, 0.0f },
-          BRACOS(0.25f, 0.35f), PERNAS(-0.25f, -0.10f), PES(-0.15f)),
-    CHAVE(0.75f, 0.0f, 0.0f, [ART_CINTURA] = { 0.0f, 0.0f }),
+    CHAVE(0.00f, 0, 0, BRACOS(0, 0)),
+    CHAVE(0.17f, -0.48f, -0.48f, BRACOS(0.95f, -0.58f),
+          [ART_CINTURA] = { 0.14f, 0 }, PERNAS(0.32f, 0.38f)),
+    CHAVE(0.25f, -0.52f, -0.52f, BRACOS(1.10f, -0.66f),
+          [ART_CINTURA] = { -0.24f, 0 }, PERNAS(-0.18f, -0.20f), PES(-0.15f)),
+    CHAVE(0.46f, -0.52f, -0.52f, BRACOS(1.10f, -0.66f),
+          [ART_CINTURA] = { -0.28f, 0 }, PERNAS(0.04f, 0.12f)),
+    CHAVE(0.62f, -0.44f, -0.44f, BRACOS(0.92f, -0.54f),
+          [ART_CINTURA] = { 0.12f, 0 }, PERNAS(0.27f, 0.30f)),
+    CHAVE(0.84f, 0, 0, BRACOS(0, 0)),
 };
 
 /* Investida = tachiai: a saída agachada, explodindo para a frente.
@@ -282,11 +276,11 @@ static const Golpe CATALOGO[GOLPE_QTD] = {
         .descricao = "Empurra com as duas mãos.",
         .chaves = CHAVES_EMPURRAO, .qtd_chaves = QTD(CHAVES_EMPURRAO),
         .tempo_preparo = 0.12f,
-        .tempo_ativo = 0.20f,           /* cobre as duas estocadas */
-        .duracao = 0.50f,
+        .tempo_ativo = 0.53f,           /* inclui a passada final */
+        .duracao = 0.85f,
         .parte_ataque = PARTE_ANTEBRACO_D,
         .parte_ataque_2 = PARTE_ANTEBRACO_E,
-        .avanco = 60.0f,                /* acompanha o empurrão (suriashi) */
+        .avanco = 85.0f,                /* acompanha o empurrão (suriashi) */
         .impulso = 380.0f,              /* medido: com 170 o alvo recuava só 11 cm */
         .impulso_vertical = 0.0f,
         .impulso_lateral = 0.0f,
@@ -301,12 +295,12 @@ static const Golpe CATALOGO[GOLPE_QTD] = {
         .descricao = "Ergue o adversário por baixo.",
         .chaves = CHAVES_LEVANTADOR, .qtd_chaves = QTD(CHAVES_LEVANTADOR),
         .tempo_preparo = 0.16f,
-        .tempo_ativo = 0.20f,
-        .duracao = 0.62f,
+        .tempo_ativo = 0.34f,
+        .duracao = 2.85f,
         .parte_ataque = PARTE_ANTEBRACO_D,
         .parte_ataque_2 = PARTE_ANTEBRACO_E,
         .avanco = 20.0f,
-        .impulso = 80.0f,
+        .impulso = 18.0f,
         .impulso_vertical = 150.0f,
         .impulso_lateral = 0.0f,
         .dano = 8.0f,
@@ -317,11 +311,11 @@ static const Golpe CATALOGO[GOLPE_QTD] = {
     },
     [GOLPE_TAPA_LATERAL] = {
         .nome = "Tapa lateral",
-        .descricao = "Tapa rápido que desvia para o lado.",
+        .descricao = "Tapa de esquerda com giro para a direita.",
         .chaves = CHAVES_TAPA_LATERAL, .qtd_chaves = QTD(CHAVES_TAPA_LATERAL),
-        .tempo_preparo = 0.08f,
-        .tempo_ativo = 0.16f,
-        .duracao = 0.32f,
+        .tempo_preparo = 0.28f,
+        .tempo_ativo = 0.41f,
+        .duracao = 0.90f,
         .parte_ataque = PARTE_ANTEBRACO_E,
         .parte_ataque_2 = PARTE_BRACO_E,   /* o braço todo chicoteia */
         .avanco = 0.0f,
@@ -336,17 +330,16 @@ static const Golpe CATALOGO[GOLPE_QTD] = {
     },
     [GOLPE_BARRIGADA] = {
         .nome = "Barrigada",
-        .descricao = "Golpe de barriga, curto e pesado.",
+        .descricao = "Salto para a frente com os braços abertos.",
         .chaves = CHAVES_BARRIGADA, .qtd_chaves = QTD(CHAVES_BARRIGADA),
-        .tempo_preparo = 0.20f,
-        .tempo_ativo = 0.28f,           /* cobre os dois pulos do quadril */
-        .duracao = 0.75f,
+        .tempo_preparo = 0.19f,
+        .tempo_ativo = 0.39f,
+        .duracao = 0.84f,
         .parte_ataque = PARTE_TRONCO,
         .parte_ataque_2 = PARTE_BACIA,
-        .avanco = 70.0f,
+        .avanco = 125.0f,
         .impulso = 310.0f,
         .impulso_vertical = 30.0f,
-        .agarra = true,                 /* segura a faixa enquanto empurra */
         .impulso_lateral = 0.0f,
         .dano = 15.0f,
         .tempo_cura = 8.0f,
