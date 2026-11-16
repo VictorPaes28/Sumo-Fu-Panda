@@ -15,7 +15,7 @@
 /* ---------------------------------------------------------------- Janela */
 #define JANELA_LARGURA      1280
 #define JANELA_ALTURA       720
-#define JANELA_TITULO       "Jogo de Sumo Kung Fu Panda"
+#define JANELA_TITULO       "Sumo-Fu Panda"
 #define NOME_JOGO           "SUMÔ-FU PANDA"  /* nome escolhido pelo grupo */
 #define JANELA_FPS          60
 
