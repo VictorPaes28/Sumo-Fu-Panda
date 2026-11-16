@@ -4,6 +4,7 @@
  *
  * Dono: Integrante B.
  */
+#include <math.h>
 #include <stddef.h>
 #include <string.h>
 #include "telas.h"
@@ -90,6 +91,46 @@ static void desenhar_fundo_menu(void)
     DrawEllipse((int)centro.x, (int)centro.y, 420.0f, 70.0f, Fade(WHITE, 0.08f));
 }
 
+/* Lua grande atrás do título, com um halo: dá profundidade ao céu. */
+static void desenhar_lua(void)
+{
+    Vector2 c = { (float)CENTRO_X, 150.0f };
+    for (int k = 5; k >= 1; k--)
+        DrawCircleV(c, 150.0f + k * 22.0f, Fade((Color){ 255, 200, 140, 255 }, 0.025f));
+    DrawCircleV(c, 150.0f, (Color){ 120, 52, 46, 255 });
+    DrawCircleV((Vector2){ c.x - 18.0f, c.y - 12.0f }, 132.0f, (Color){ 138, 62, 50, 255 });
+}
+
+/* Lanterna de papel vermelha pendurada no alto, balançando de leve. */
+static void desenhar_lanterna(float x, float t)
+{
+    float balanco = 6.0f * sinf(t * 1.3f + x);
+    Vector2 topo = { x, 0.0f }, centro = { x + balanco, 96.0f };
+    DrawLineEx(topo, (Vector2){ centro.x, centro.y - 34.0f }, 2.0f, (Color){ 40, 24, 20, 255 });
+    DrawCircleV(centro, 44.0f, Fade((Color){ 255, 120, 60, 255 }, 0.15f));     /* brilho */
+    DrawEllipse((int)centro.x, (int)centro.y, 30.0f, 36.0f, (Color){ 200, 44, 36, 255 });
+    for (int k = -1; k <= 1; k++)                                             /* gomos */
+        DrawEllipseLines((int)centro.x, (int)centro.y, 30.0f - fabsf((float)k) * 14.0f, 36.0f,
+                         (Color){ 150, 28, 24, 255 });
+    DrawRectangle((int)centro.x - 12, (int)centro.y - 40, 24, 6, (Color){ 60, 34, 24, 255 });
+    DrawRectangle((int)centro.x - 12, (int)centro.y + 34, 24, 6, (Color){ 60, 34, 24, 255 });
+}
+
+/* Pétalas de cerejeira caindo. A posição de cada uma sai do tempo e do
+ * número dela (nada é guardado): desenhar não muda estado. */
+static void desenhar_petalas(float t)
+{
+    for (int k = 0; k < MENU_PETALAS; k++) {
+        float semente = (float)k * 37.13f;
+        float velocidade = 28.0f + fmodf(semente, 24.0f);
+        float y = fmodf(t * velocidade + semente * 9.0f, (float)JANELA_ALTURA + 40.0f) - 20.0f;
+        float x = fmodf(semente * 23.7f, (float)JANELA_LARGURA) + 30.0f * sinf(t * 0.8f + semente);
+        float giro = t * 60.0f + semente * 10.0f;
+        DrawRectanglePro((Rectangle){ x, y, 7.0f, 4.0f }, (Vector2){ 3.5f, 2.0f }, giro,
+                         Fade((Color){ 255, 182, 206, 255 }, 0.75f));
+    }
+}
+
 /* Título grande na fonte do jogo, com contorno escuro (o texto desenhado
  * deslocado em volta) e sombra. */
 static void desenhar_titulo_menu(Font fonte)
@@ -103,7 +144,7 @@ static void desenhar_titulo_menu(Font fonte)
                        (Color){ 20, 10, 16, 255 });
     DrawTextEx(fonte, NOME_JOGO, pos, tamanho, espaco, UI_DESTAQUE);
     int y_sub = (int)(y + medida.y + 6.0f);
-    ui_texto_centro_sombra("Sumô com física, no Palácio de Jade", CENTRO_X, y_sub, 26, UI_TEXTO);
+    ui_texto_centro_sombra("Empurre. Derrube. Vença.", CENTRO_X, y_sub, 28, UI_TEXTO);
 }
 
 /* Botão do menu: o escolhido fica cheio, com borda dourada e setas dos lados. */
@@ -128,7 +169,12 @@ static void desenhar_botao(const char *texto, float y, bool escolhido)
 
 void menu_desenhar(const TelaMenu *t, Font titulo)
 {
+    float tempo = (float)GetTime();
     desenhar_fundo_menu();
+    desenhar_lua();
+    desenhar_lanterna(170.0f, tempo);
+    desenhar_lanterna(JANELA_LARGURA - 170.0f, tempo);
+    desenhar_petalas(tempo);
     desenhar_titulo_menu(titulo);
     for (int i = 0; i < QTD_OPCOES_MENU; i++)
         desenhar_botao(OPCOES_MENU[i], MENU_BOTAO_Y + i * MENU_BOTAO_PASSO, i == t->opcao);
