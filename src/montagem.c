@@ -9,6 +9,13 @@
 #include "config.h"
 #include "ui.h"
 
+static const TipoGolpe GOLPES_DISPONIVEIS[] = {
+    GOLPE_LEVANTADOR, GOLPE_TAPA_LATERAL, GOLPE_TAPA_BAIXO,
+    GOLPE_BARRIGADA, GOLPE_INVESTIDA, GOLPE_EMPURRAR_FORA,
+    GOLPE_FORCAR_FORA, GOLPE_PROJECAO_CIMA, GOLPE_PROJECAO_BAIXO
+};
+#define QTD_DISPONIVEIS ((int)(sizeof GOLPES_DISPONIVEIS / sizeof GOLPES_DISPONIVEIS[0]))
+
 void montagem_iniciar(TelaMontagem *t)
 {
     *t = (TelaMontagem){0};
@@ -29,13 +36,13 @@ static bool atualizar_jogador(TelaMontagem *t, int i, Combo *combo, const Intenc
         return false;
 
     /* Cursores. O do catálogo dá a volta; o do combo para nas pontas. */
-    t->cursor_catalogo[i] = ((t->cursor_catalogo[i] + in->direcional_y) % GOLPE_QTD + GOLPE_QTD) % GOLPE_QTD;
+    t->cursor_catalogo[i] = ((t->cursor_catalogo[i] + in->direcional_y) % QTD_DISPONIVEIS + QTD_DISPONIVEIS) % QTD_DISPONIVEIS;
     t->cursor_combo[i] += in->direcional_x;
     if (t->cursor_combo[i] < 0) t->cursor_combo[i] = 0;
     if (t->cursor_combo[i] > COMBO_MAX - 1) t->cursor_combo[i] = COMBO_MAX - 1;
 
     int pos = t->cursor_combo[i];
-    TipoGolpe escolhido = (TipoGolpe)t->cursor_catalogo[i];
+    TipoGolpe escolhido = GOLPES_DISPONIVEIS[t->cursor_catalogo[i]];
 
     if (in->a) {
         if (combo->tamanho == COMBO_MAX) {
@@ -177,20 +184,20 @@ static void desenhar_linha_golpe(Rectangle r, const Golpe *d, bool selecionado, 
  * golpes acima ou abaixo. A quantidade vem de GOLPE_QTD. */
 static void desenhar_catalogo(float x, float w, int cursor, Color cor)
 {
-    int visiveis = (GOLPE_QTD < MONTAGEM_GOLPES_VISIVEIS) ? GOLPE_QTD : MONTAGEM_GOLPES_VISIVEIS;
-    int primeiro = primeiro_visivel(cursor, GOLPE_QTD, visiveis);
+    int visiveis = (QTD_DISPONIVEIS < MONTAGEM_GOLPES_VISIVEIS) ? QTD_DISPONIVEIS : MONTAGEM_GOLPES_VISIVEIS;
+    int primeiro = primeiro_visivel(cursor, QTD_DISPONIVEIS, visiveis);
 
     for (int k = 0; k < visiveis; k++) {
         int g = primeiro + k;
         Rectangle linha = { x + MON_LINHA_MARGEM, MON_LISTA_Y + k * MON_LINHA_ALTURA,
                             w - 2.0f * MON_LINHA_MARGEM, MON_LINHA_ALTURA };
-        desenhar_linha_golpe(linha, golpe_dados((TipoGolpe)g), g == cursor, cor);
+        desenhar_linha_golpe(linha, golpe_dados(GOLPES_DISPONIVEIS[g]), g == cursor, cor);
     }
 
     float cx = x + w / 2.0f;
     if (primeiro > 0)
         desenhar_seta(cx, MON_LISTA_Y - MON_SETA_ALTURA - 4.0f, true, UI_DESTAQUE);
-    if (primeiro + visiveis < GOLPE_QTD)
+    if (primeiro + visiveis < QTD_DISPONIVEIS)
         desenhar_seta(cx, MON_LISTA_Y + visiveis * MON_LINHA_ALTURA + 4.0f, false, UI_DESTAQUE);
 }
 
@@ -321,7 +328,7 @@ static void desenhar_lado(const TelaMontagem *t, int i, const Combo *combo)
      * mesmo com menos golpes: assim ela não pula de lugar. */
     float y = MON_LISTA_Y + MONTAGEM_GOLPES_VISIVEIS * MON_LINHA_ALTURA + MON_SETA_ALTURA + MON_ESPACO;
     Rectangle caixa = { x + MON_LINHA_MARGEM, y, w - 2.0f * MON_LINHA_MARGEM, MON_DESCRICAO_ALTURA };
-    desenhar_descricao(caixa, golpe_dados((TipoGolpe)t->cursor_catalogo[i])->descricao);
+    desenhar_descricao(caixa, golpe_dados(GOLPES_DISPONIVEIS[t->cursor_catalogo[i]])->descricao);
     y += MON_DESCRICAO_ALTURA + MON_ESPACO;
 
     desenhar_espacos_combo(t, i, combo, x, w, y);
