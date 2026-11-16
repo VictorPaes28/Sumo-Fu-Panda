@@ -37,6 +37,7 @@
 typedef struct {
     int lutador;          /* 0 ou 1; -1 para o chão */
     ParteCorpo parte;     /* ignorado no chão       */
+    float apoio_marcha;   /* aderencia extra da passada (0 a 1) */
 } RefPeca;
 
 /* Toque entre peças de lutadores diferentes, registrado no passo. */

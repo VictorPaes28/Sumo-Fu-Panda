@@ -19,7 +19,7 @@ que enfraquece o equilíbrio do adversário até curar (lista ordenada + inserti
 | Vitória do round | o outro **sai do ringue** (bacia além de `RINGUE_RAIO`) ou **cai** (qualquer parte além dos pés encosta no chão por `CORPO_TEMPO_QUEDA`, como no sumô) |
 | Empate no round | os dois perdem no mesmo passo → round repetido |
 | Vitória da partida | `PARTIDA_ROUNDS_PARA_VENCER` rounds (melhor de 3) |
-| Combo | exatamente `COMBO_MAX` (4) golpes para confirmar; circular; reinicia após `COMBO_TEMPO_REINICIO` sem golpear |
+| Combo | exatamente `COMBO_MAX` (4) golpes para confirmar; circular; avança ao executar cada golpe e preserva o próximo durante pausas |
 | Botão A durante um golpe | ignorado (sem fila de comandos) |
 | Cada golpe | acerta no máximo uma vez; acerta quando uma das peças de ataque do golpe toca o adversário; encostar fora de um golpe só empurra |
 | Fases do golpe | **preparo** (puxa o braço / abaixa), **ativo** (só aqui acerta; aplica o avanço), **volta** (vulnerável). Tempos em `golpe.c` |
@@ -137,7 +137,7 @@ Telas não trocam de tela nem tocam sons: devolvem uma ação, e o `main.c` deci
                  relogio += FISICA_DT
                  acumulador -= FISICA_DT
 4. partida   lutador_atualizar(l, dt, relogio) x2 -> hematomas_curar, stamina, fim do golpe,
-                                                     reinício do combo, queda
+                                                     queda
 5. partida   regras: saiu do ringue? caiu? empate? NaN?  -> estado do round
 6. main      sons a partir de partida.eventos
 7. main      render_cena(...) e hud_desenhar(...)     só leitura

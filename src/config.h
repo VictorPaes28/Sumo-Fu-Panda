@@ -75,7 +75,11 @@
                                             salvar: ponto sem volta (m) */
 
 /* Inclinação do corpo (rad, aproximado): para onde a mola de equilíbrio puxa. */
-#define INCLINACAO_ANDAR          0.14f  /* inclina para a frente ao andar */
+#define MARCHA_ADERENCIA          1.3f  /* atrito extra do pe de apoio */
+#define MARCHA_ALTURA             0.16f  /* altura relativa do pe em voo (m) */
+#define MARCHA_MOLA               350.0f /* controle da altura relativa (1/s2) */
+#define MARCHA_AMORTECIMENTO      5.0f   /* amortecimento vertical (1/s) */
+#define INCLINACAO_ANDAR          0.06f  /* inclina para a frente ao andar */
 #define INCLINACAO_IMPACTO        0.0f   /* quanto a mola tomba o corpo na direção do golpe.
                                             Era 0,35: junto com a mola fraca, quase todo
                                             golpe terminava com o lutador sentado */
@@ -122,7 +126,6 @@
 
 /* ---------------------------------------------------------------- Combo */
 #define COMBO_MAX                 4      /* espaços no combo */
-#define COMBO_TEMPO_REINICIO      1.5f   /* tempo sem golpear para voltar ao 1º golpe (s) */
 
 /* ---------------------------------------------------------------- Stamina */
 #define STAMINA_MAX               100.0f /* (pts) */
@@ -181,7 +184,7 @@
  * descontada (andar não é cair). */
 #define REFLEXO_INICIO            0.12f  /* desequilíbrio a partir do qual reage (m) */
 #define REFLEXO_FAIXA             0.30f  /* acima do início, quanto mais até a reação total (m) */
-#define REFLEXO_SUAVIZACAO        6.0f  /* rapidez com que a reação aparece e some (1/s) */
+#define REFLEXO_SUAVIZACAO        9.0f  /* rapidez com que a reação aparece e some (1/s) */
 #define REFLEXO_GIRO_BRACOS       2.2f   /* braços girando ("moinho") ao cair para trás (voltas/s) */
 #define GOLPE_BUFFER              0.25f  /* o aperto do golpe fica guardado este tempo e sai
                                             assim que o lutador puder golpear (s) */
@@ -198,7 +201,7 @@
                                             largo: empurrado, recua andando em vez de sentar */
 #define PASSO_FORCA               900.0f /* força que leva o pé até o lugar do passo (N/m) */
 #define PASSO_LEVANTAR            0.55f  /* fração do peso da perna tirada do chão no passo */
-#define PASSO_ESPERA              0.12f  /* intervalo mínimo entre dois passos (s) */
+#define PASSO_ESPERA              0.08f  /* intervalo mínimo entre dois passos (s) */
 #define PASSO_APOIO_MINIMO        0.3f   /* só dá passo com pelo menos este apoio (0 a 1) */
 #define PASSO_PE_ABERTO           0.10f  /* o pé pisa um pouco para fora do ponto, do lado da
                                             própria perna: a base continua larga (m) */
@@ -216,7 +219,7 @@
 #define TORNOZELO_EQUILIBRIO      1.6f   /* equilíbrio pelo pé: rad de tornozelo por metro de
                                             desequilíbrio para a frente/trás */
 #define TORNOZELO_EQUILIBRIO_MAX  0.30f  /* o tornozelo compensa no máximo isto (rad) */
-#define MOLA_EQUILIBRIO_FRACAO    1.0f  /* parte da "mola de equilíbrio" que é força de jogo
+#define MOLA_EQUILIBRIO_FRACAO    0.90f  /* parte da "mola de equilíbrio" que é força de jogo
                                             (de fora do corpo); o resto é dos músculos das
                                             pernas, com a reação nos pés apoiados */
 
