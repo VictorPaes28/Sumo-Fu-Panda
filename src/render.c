@@ -405,12 +405,13 @@ static void desenhar_ringue(const Partida *p, const Camera3D *cam)
     DrawCube((Vector3){  0.35f, 0.002f, 0.0f }, 0.05f, 0.004f, 0.55f, COR_LINHA);
 }
 
-static void desenhar_lutador(const Lutador *l, int indice_personagem, Recursos *r,
-                             bool depuracao)
+/* Um corpo com a pele do personagem (ou caixas, sem modelo), nas cores do
+ * jogador. Serve para a luta e para a prévia da tela de seleção. */
+static void desenhar_corpo(const Corpo *c, int indice_personagem, int jogador, Recursos *r,
+                           bool depuracao)
 {
-    const Corpo *c = &l->corpo;
     const Personagem *p = c->personagem;
-    Color cor = COR_JOGADOR[l->indice];
+    Color cor = COR_JOGADOR[jogador];
 
     /* Sombra simples sob a bacia. */
     Vector3 b = corpo_posicao(c);
@@ -425,7 +426,7 @@ static void desenhar_lutador(const Lutador *l, int indice_personagem, Recursos *
                     r->peles[indice_personagem].carregada;
     if (tem_pele) {
         const Pele *pele = &r->peles[indice_personagem];
-        Color tom = modelo_pintado(pele) ? TOM_PINTADO[l->indice] : TOM_MODELO[l->indice];
+        Color tom = modelo_pintado(pele) ? TOM_PINTADO[jogador] : TOM_MODELO[jogador];
         pele_desenhar(&r->peles[indice_personagem], pecas, tom);
     } else {
         for (int i = 0; i < PARTE_QTD; i++) {
@@ -449,7 +450,8 @@ void render_cena(const Partida *p, Recursos *r, const CameraLuta *c, bool depura
     desenhar_ringue(p, &c->camera);
     if (p->round_ativo) {
         for (int i = 0; i < 2; i++)
-            desenhar_lutador(&p->lutadores[i], p->jogadores[i].personagem, r, depuracao);
+            desenhar_corpo(&p->lutadores[i].corpo, p->jogadores[i].personagem,
+                           p->lutadores[i].indice, r, depuracao);
     }
     if (depuracao)
         DrawGrid(12, 0.5f);
@@ -459,4 +461,26 @@ void render_cena(const Partida *p, Recursos *r, const CameraLuta *c, bool depura
         DrawText(TextFormat("contatos no passo: %d  relogio: %.1f s", p->fisica.qtd_contatos,
                             p->relogio), 10, JANELA_ALTURA - 60, 20, GREEN);
     }
+}
+
+void render_previa(const Corpo *c, int personagem, int jogador, Recursos *r,
+                   RenderTexture2D alvo, float angulo)
+{
+    /* A câmera gira em volta do lutador (ele fica parado, olhando para +Z). */
+    Camera3D cam = { 0 };
+    cam.position = (Vector3){ sinf(angulo) * PREVIA_DISTANCIA, PREVIA_ALTURA_CAMERA,
+                              cosf(angulo) * PREVIA_DISTANCIA };
+    cam.target = (Vector3){ 0.0f, PREVIA_ALTURA_ALVO, 0.0f };
+    cam.up = (Vector3){ 0.0f, 1.0f, 0.0f };
+    cam.fovy = PREVIA_FOV;
+    cam.projection = CAMERA_PERSPECTIVE;
+
+    luz_atualizar(r->luz, cam.position);
+    BeginTextureMode(alvo);
+    ClearBackground(BLANK);
+    BeginMode3D(cam);
+    desenhar_disco_gradiente(0.75f, 0.001f, Fade(COR_ARGILA, 0.9f), Fade(COR_ARGILA, 0.0f));
+    desenhar_corpo(c, personagem, jogador, r, false);
+    EndMode3D();
+    EndTextureMode();
 }

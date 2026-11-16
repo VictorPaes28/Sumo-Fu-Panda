@@ -26,6 +26,7 @@
 #include "partida.h"
 #include "personagem.h"
 #include "render.h"
+#include "previa.h"
 
 typedef enum {
     TELA_MENU, TELA_SELECAO, TELA_MONTAGEM, TELA_LUTA, TELA_RESULTADO
@@ -45,6 +46,7 @@ typedef struct {
     bool controle_antes[2];      /* para pausar quando um controle desconecta */
     Recursos recursos;
     CameraLuta camera;           /* câmera da luta (acompanha e treme) */
+    Previa previa[2];            /* lutador escolhido, ao vivo, na seleção */
 } Jogo;
 
 static void tocar_sons_de_menu(const Jogo *j, const Intencao in[2])
@@ -149,6 +151,8 @@ static void atualizar(Jogo *j, float dt)
 
     case TELA_SELECAO: {
         AcaoSelecao a = selecao_atualizar(&j->selecao, in);
+        for (int i = 0; i < 2; i++)
+            previa_atualizar(&j->previa[i], j->selecao.escolha[i], dt);
         if (a == SELECAO_CONCLUIDA) {
             for (int i = 0; i < 2; i++)
                 j->jogadores[i].personagem = j->selecao.escolha[i];
@@ -199,7 +203,11 @@ static void desenhar(Jogo *j)
 
     switch (j->tela) {
     case TELA_MENU:      menu_desenhar(&j->menu);           break;
-    case TELA_SELECAO:   selecao_desenhar(&j->selecao);     break;
+    case TELA_SELECAO:
+        selecao_desenhar(&j->selecao);
+        for (int i = 0; i < 2; i++)
+            previa_desenhar(&j->previa[i], &j->recursos, selecao_area_previa(i));
+        break;
     case TELA_MONTAGEM:
         montagem_desenhar(&j->montagem, &j->jogadores[0].combo, &j->jogadores[1].combo);
         break;
@@ -233,6 +241,8 @@ int main(void)
     fisica_iniciar_biblioteca();
     recursos_carregar(&j->recursos);
     render_iniciar_camera(&j->camera);
+    for (int i = 0; i < 2; i++)
+        previa_criar(&j->previa[i], i);
     for (int i = 0; i < 2; i++) {
         j->jogadores[i].personagem = 0;
         combo_iniciar(&j->jogadores[i].combo);
@@ -250,6 +260,8 @@ int main(void)
     encerrar_luta(j);
     for (int i = 0; i < 2; i++)
         combo_liberar(&j->jogadores[i].combo);
+    for (int i = 0; i < 2; i++)
+        previa_liberar(&j->previa[i]);
     recursos_liberar(&j->recursos);
     CloseAudioDevice();
     CloseWindow();

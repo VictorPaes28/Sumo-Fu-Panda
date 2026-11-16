@@ -77,14 +77,14 @@ static const float SEL_GRADE_Y        = 56.0f;   /* do topo do painel até a gra
 static const float SEL_CARTAO_ALTURA  = 56.0f;
 static const float SEL_CARTAO_ESPACO  = 10.0f;   /* entre um cartão e outro */
 static const float SEL_FICHA_ESPACO   = 24.0f;   /* da grade até a ficha */
-static const float SEL_ROTULO_LARGURA = 150.0f;  /* coluna com "Peso", "Velocidade"... */
-static const float SEL_VALOR_LARGURA  = 100.0f;  /* coluna com o número da barra */
-static const float SEL_BARRA_ALTURA   = 18.0f;
-static const float SEL_BARRA_PASSO    = 42.0f;   /* de uma barra à seguinte */
+static const float SEL_BLOCO_ESPACO   = 16.0f;   /* entre os blocos da ficha */
+static const float SEL_PREVIA_LARGURA = 220.0f;  /* coluna da prévia 3D (previa.h) */
+static const float SEL_BARRA_ALTURA   = 16.0f;
+static const float SEL_BARRA_PASSO    = 62.0f;   /* de um quesito ao seguinte */
 static const int   SEL_FONTE_CARTAO   = 22;
 static const int   SEL_FONTE_NOME     = 44;
 static const int   SEL_FONTE_FRASE    = 22;
-static const int   SEL_FONTE_ROTULO   = 22;
+static const int   SEL_FONTE_ROTULO   = 20;
 static const int   SEL_FONTE_VALOR    = 20;
 static const int   FONTE_MINIMA       = 10;      /* o texto encolhe até aqui para caber */
 
@@ -219,46 +219,90 @@ static void desenhar_cartao(Rectangle r, const char *nome, bool escolhido, bool 
                     tamanho, escolhido ? UI_TEXTO : UI_TEXTO_FRACO);
 }
 
-/* Grade com todos os personagens; devolve a altura ocupada. */
-static float desenhar_grade(Rectangle area, int escolhido, bool pronto, Color cor)
+/* Altura da grade com todos os personagens (cresce uma linha a cada
+ * SELECAO_CARTOES_POR_LINHA personagens). */
+static float altura_da_grade(void)
+{
+    int linhas = linhas_da_grade(personagem_quantidade());
+    return linhas * SEL_CARTAO_ALTURA + (linhas - 1) * SEL_CARTAO_ESPACO;
+}
+
+static void desenhar_grade(Rectangle area, int escolhido, bool pronto, Color cor)
 {
     int qtd = personagem_quantidade();
     for (int k = 0; k < qtd; k++)
         desenhar_cartao(retangulo_cartao(area, k, qtd), personagem_dados(k)->nome,
                         k == escolhido, pronto, cor);
-    int linhas = linhas_da_grade(qtd);
-    return linhas * SEL_CARTAO_ALTURA + (linhas - 1) * SEL_CARTAO_ESPACO;
 }
 
-/* Uma linha da ficha: rótulo, barra comparada ao máximo e o número. */
+/* Onde fica cada bloco de um lado da tela, de cima para baixo: grade,
+ * cabeçalho (nome e frase) e, lado a lado, a prévia 3D e as barras. Calculado
+ * num lugar só, para o desenho e o main.c (que desenha a prévia) concordarem. */
+typedef struct {
+    Rectangle painel, grade, cabecalho, previa, barras;
+    float y_rodape;
+} LayoutSelecao;
+
+static LayoutSelecao layout_do_lado(int jogador)
+{
+    LayoutSelecao l;
+    float x = (jogador == 0) ? 80.0f : (float)CENTRO_X + 40.0f;
+    float w = (float)CENTRO_X - 120.0f;
+    l.painel = (Rectangle){ x, SEL_PAINEL_Y, w, SEL_PAINEL_ALTURA };
+    l.grade = (Rectangle){ x + SEL_MARGEM, SEL_PAINEL_Y + SEL_GRADE_Y, w - 2.0f * SEL_MARGEM,
+                           altura_da_grade() };
+    float y = l.grade.y + l.grade.height + SEL_FICHA_ESPACO;
+    l.cabecalho = (Rectangle){ l.grade.x, y, l.grade.width,
+                               SEL_FONTE_NOME + 12.0f + SEL_FONTE_FRASE };
+    y += l.cabecalho.height + SEL_BLOCO_ESPACO;
+    l.y_rodape = SEL_PAINEL_Y + SEL_PAINEL_ALTURA - 64.0f;
+    float altura = l.y_rodape - SEL_BLOCO_ESPACO - y;
+    l.previa = (Rectangle){ l.grade.x, y, SEL_PREVIA_LARGURA, altura };
+    float x_barras = l.previa.x + l.previa.width + SEL_BLOCO_ESPACO;
+    l.barras = (Rectangle){ x_barras, y, l.grade.x + l.grade.width - x_barras, altura };
+    return l;
+}
+
+Rectangle selecao_area_previa(int jogador)
+{
+    return layout_do_lado(jogador).previa;
+}
+
+/* Nome grande e, embaixo, o jeito de lutar. */
+static void desenhar_cabecalho(Rectangle area, const Personagem *p)
+{
+    int cx = (int)(area.x + area.width / 2);
+    ui_texto_centro(p->nome, cx, (int)area.y, fonte_que_cabe(p->nome, SEL_FONTE_NOME, area.width),
+                    UI_TEXTO);
+    const char *frase = frase_do_personagem(p->nome);
+    ui_texto_centro(frase, cx, (int)(area.y + SEL_FONTE_NOME + 12.0f),
+                    fonte_que_cabe(frase, SEL_FONTE_FRASE, area.width), UI_DESTAQUE);
+}
+
+/* Moldura da prévia: o lutador (desenhado pelo main.c) fica por cima. */
+static void desenhar_moldura_previa(Rectangle area, Color cor)
+{
+    ui_painel(area, Fade(BLACK, 0.30f), UI_BORDA);
+    DrawRectangle((int)area.x, (int)(area.y + area.height) - 4, (int)area.width, 4, cor);
+}
+
+/* Um quesito em coluna: rótulo e número na mesma linha, a barra embaixo. */
 static void desenhar_quesito(Rectangle area, float y, const char *rotulo, float fracao,
                              const char *valor, Color cor)
 {
     DrawText(rotulo, (int)area.x, (int)y, SEL_FONTE_ROTULO, UI_TEXTO_FRACO);
-    float x_barra = area.x + SEL_ROTULO_LARGURA;
-    float w_barra = area.width - SEL_ROTULO_LARGURA - SEL_VALOR_LARGURA;
-    ui_barra((Rectangle){ x_barra, y + 2.0f, w_barra, SEL_BARRA_ALTURA }, fracao, cor);
-    int tamanho = fonte_que_cabe(valor, SEL_FONTE_VALOR, SEL_VALOR_LARGURA - 10.0f);
+    int tamanho = fonte_que_cabe(valor, SEL_FONTE_VALOR, area.width / 2.0f);
     DrawText(valor, (int)(area.x + area.width) - MeasureText(valor, tamanho), (int)y + 1,
              tamanho, UI_TEXTO);
+    ui_barra((Rectangle){ area.x, y + SEL_FONTE_ROTULO + 6.0f, area.width, SEL_BARRA_ALTURA },
+             fracao, cor);
 }
 
-/* Ficha do personagem escolhido: nome, jeito de lutar e as três barras. */
-static void desenhar_ficha(Rectangle area, const Personagem *p, Color cor)
+/* As três barras, comparadas ao máximo do catálogo, centradas na área. */
+static void desenhar_barras(Rectangle area, const Personagem *p, Color cor)
 {
     MaximosCatalogo max = maximos_do_catalogo();
-    int cx = (int)(area.x + area.width / 2);
-    float y = area.y;
-
-    int fonte_nome = fonte_que_cabe(p->nome, SEL_FONTE_NOME, area.width);
-    ui_texto_centro(p->nome, cx, (int)y, fonte_nome, UI_TEXTO);
-    y += SEL_FONTE_NOME + 12.0f;
-
-    const char *frase = frase_do_personagem(p->nome);
-    ui_texto_centro(frase, cx, (int)y, fonte_que_cabe(frase, SEL_FONTE_FRASE, area.width),
-                    UI_DESTAQUE);
-    y += SEL_FONTE_FRASE + 22.0f;
-
+    float y = area.y + (area.height - 3.0f * SEL_BARRA_PASSO) / 2.0f;
     float massa = massa_total(p);
     desenhar_quesito(area, y, "Peso", fracao_do_maximo(massa, max.peso),
                      TextFormat("%.0f kg", massa), cor);
@@ -272,13 +316,11 @@ static void desenhar_ficha(Rectangle area, const Personagem *p, Color cor)
 
 static void desenhar_lado_selecao(const TelaSelecao *t, int i)
 {
-    float x = (i == 0) ? 80.0f : (float)CENTRO_X + 40.0f;
-    float w = (float)CENTRO_X - 120.0f;
+    LayoutSelecao l = layout_do_lado(i);
     Color cor = ui_cor_jogador(i);
-    Rectangle painel = { x, SEL_PAINEL_Y, w, SEL_PAINEL_ALTURA };
-    ui_painel(painel, UI_PAINEL, t->pronto[i] ? cor : UI_BORDA);
+    ui_painel(l.painel, UI_PAINEL, t->pronto[i] ? cor : UI_BORDA);
 
-    int cx = (int)(x + w / 2);
+    int cx = (int)(l.painel.x + l.painel.width / 2);
     ui_texto_centro(TextFormat("Jogador %d", i + 1), cx, (int)SEL_PAINEL_Y + 14, 26, cor);
 
     const Personagem *p = personagem_dados(t->escolha[i]);
@@ -287,21 +329,17 @@ static void desenhar_lado_selecao(const TelaSelecao *t, int i)
         return;
     }
 
-    /* Grade em cima; a ficha começa logo abaixo, onde quer que a grade termine
-     * (com mais personagens a grade ganha linhas e a ficha desce junto). */
-    Rectangle conteudo = { x + SEL_MARGEM, SEL_PAINEL_Y + SEL_GRADE_Y,
-                           w - 2.0f * SEL_MARGEM, 0.0f };
-    float altura_grade = desenhar_grade(conteudo, t->escolha[i], t->pronto[i], cor);
-    conteudo.y += altura_grade + SEL_FICHA_ESPACO;
-    desenhar_ficha(conteudo, p, cor);
+    desenhar_grade(l.grade, t->escolha[i], t->pronto[i], cor);
+    desenhar_cabecalho(l.cabecalho, p);
+    desenhar_moldura_previa(l.previa, cor);
+    desenhar_barras(l.barras, p, cor);
 
-    int y_rodape = (int)(SEL_PAINEL_Y + SEL_PAINEL_ALTURA) - 64;
     if (t->pronto[i])
-        ui_texto_centro("PRONTO!", cx, y_rodape - 6, 36, cor);
+        ui_texto_centro("PRONTO!", cx, (int)l.y_rodape - 6, 36, cor);
     else {
         const char *ajuda = "esq/dir: escolher   A: confirmar   B: voltar";
-        ui_texto_centro(ajuda, cx, y_rodape, fonte_que_cabe(ajuda, 20, w - 2.0f * SEL_MARGEM),
-                        UI_TEXTO_FRACO);
+        ui_texto_centro(ajuda, cx, (int)l.y_rodape,
+                        fonte_que_cabe(ajuda, 20, l.grade.width), UI_TEXTO_FRACO);
     }
 }
 

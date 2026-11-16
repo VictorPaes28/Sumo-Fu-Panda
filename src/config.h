@@ -272,4 +272,16 @@
 #define MONTAGEM_GOLPES_VISIVEIS  7      /* golpes da lista que aparecem de uma vez na
                                             montagem; o resto aparece rolando */
 
+/* Prévia do lutador na seleção (previa.h, render_previa). */
+#define PREVIA_LARGURA            230    /* tamanho da imagem da prévia (pixels) */
+#define PREVIA_ALTURA             330
+#define PREVIA_DISTANCIA          3.6f   /* câmera até o lutador (m)              */
+#define PREVIA_ALTURA_CAMERA      1.25f  /* altura da câmera (m)                  */
+#define PREVIA_ALTURA_ALVO        0.85f  /* ponto do corpo que a câmera olha (m)  */
+#define PREVIA_FOV                32.0f  /* abertura da câmera (graus)            */
+#define PREVIA_GIRO               0.55f  /* a câmera vai e volta até este ângulo (rad) */
+#define PREVIA_GIRO_PERIODO       7.0f   /* duração de uma ida e volta (s)        */
+#define PREVIA_ASSENTAR           0.6f   /* física simulada ao trocar de personagem,
+                                            antes de mostrar: o corpo já aparece de pé (s) */
+
 #endif /* CONFIG_H */

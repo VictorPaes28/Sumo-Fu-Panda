@@ -17,6 +17,7 @@
 #define TELAS_H
 
 #include <stdbool.h>
+#include "raylib.h"
 #include "entrada.h"
 
 /* ------------------------------------------------------------------ Menu */
@@ -51,6 +52,9 @@ void        selecao_iniciar(TelaSelecao *t);
  * Os dois prontos -> SELECAO_CONCLUIDA. */
 AcaoSelecao selecao_atualizar(TelaSelecao *t, const Intencao in[2]);
 void        selecao_desenhar(const TelaSelecao *t);
+/* Onde a tela deixa o espaço da prévia 3D do lutador do jogador (0 ou 1).
+ * A tela só desenha a moldura; o main.c desenha o lutador ali (previa.h). */
+Rectangle   selecao_area_previa(int jogador);
 
 /* ------------------------------------------------------------ Resultado */
 /* Fim da partida. Opções: 0 = "Revanche" (mesmos combos),

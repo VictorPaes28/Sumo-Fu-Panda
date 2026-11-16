@@ -40,4 +40,12 @@ void render_atualizar_camera(CameraLuta *c, const Partida *p, float dt);
  * jogo (Partida) continua só sendo lido. */
 void render_cena(const Partida *p, Recursos *r, const CameraLuta *c, bool depuracao);
 
+/* Prévia do lutador (tela de seleção): desenha o corpo c, que está em pé na
+ * origem olhando para +Z, dentro da textura 'alvo', com uma câmera que gira
+ * em volta dele ('angulo' em rad, 0 = de frente). Mesmo desenho da luta
+ * (pele ou caixas, nas cores do jogador). Chamar entre BeginDrawing e
+ * EndDrawing, fora de BeginMode3D; depois é só desenhar a textura na tela. */
+void render_previa(const Corpo *c, int personagem, int jogador, Recursos *r,
+                   RenderTexture2D alvo, float angulo);
+
 #endif /* RENDER_H */
