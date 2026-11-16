@@ -273,14 +273,18 @@
                                             montagem; o resto aparece rolando */
 
 /* Prévia do lutador na seleção (previa.h, render_previa). */
-#define PREVIA_LARGURA            230    /* tamanho da imagem da prévia (pixels) */
-#define PREVIA_ALTURA             330
+#define PREVIA_LARGURA            300    /* tamanho da imagem da prévia (pixels) */
+#define PREVIA_ALTURA             430
 #define PREVIA_DISTANCIA          3.6f   /* câmera até o lutador (m)              */
 #define PREVIA_ALTURA_CAMERA      1.25f  /* altura da câmera (m)                  */
 #define PREVIA_ALTURA_ALVO        0.85f  /* ponto do corpo que a câmera olha (m)  */
 #define PREVIA_FOV                32.0f  /* abertura da câmera (graus)            */
-#define PREVIA_GIRO               0.55f  /* a câmera vai e volta até este ângulo (rad) */
+#define PREVIA_GIRO               0.55f  /* na seleção, a câmera vai e volta até este ângulo (rad) */
 #define PREVIA_GIRO_PERIODO       7.0f   /* duração de uma ida e volta (s)        */
+#define MENU_TROCA_LUTADOR        5.0f   /* no menu, troca a dupla de lutadores a cada (s) */
+#define MENU_VIRAR                0.80f  /* no menu, os lutadores ficam de lado, frente a
+                                            frente (rad; ângulo da câmera da prévia) */
+#define MENU_GIRO                 0.10f  /* e balançam só um pouco (rad) */
 #define PREVIA_ASSENTAR           0.6f   /* física simulada ao trocar de personagem,
                                             antes de mostrar: o corpo já aparece de pé (s) */
 

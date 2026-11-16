@@ -46,7 +46,8 @@ typedef struct {
     bool controle_antes[2];      /* para pausar quando um controle desconecta */
     Recursos recursos;
     CameraLuta camera;           /* câmera da luta (acompanha e treme) */
-    Previa previa[2];            /* lutador escolhido, ao vivo, na seleção */
+    Previa previa[2];            /* lutador ao vivo: no menu e na seleção */
+    float tempo_menu;            /* desde que o menu abriu: troca os lutadores (s) */
 } Jogo;
 
 static void tocar_sons_de_menu(const Jogo *j, const Intencao in[2])
@@ -90,6 +91,22 @@ static void iniciar_luta(Jogo *j)
         menu_iniciar(&j->menu);
         j->tela = TELA_MENU;
     }
+}
+
+/* O n-ésimo lutador da vitrine do menu, com volta. Só entram os personagens
+ * com modelo 3D (a primeira tela fica bonita); sem nenhum, entram todos. */
+static int lutador_do_menu(const Jogo *j, int n)
+{
+    int qtd = personagem_quantidade(), com_modelo = 0;
+    for (int k = 0; k < qtd; k++)
+        com_modelo += j->recursos.peles[k].carregada;
+    if (com_modelo == 0)
+        return n % qtd;
+    n %= com_modelo;
+    for (int k = 0; k < qtd; k++)
+        if (j->recursos.peles[k].carregada && n-- == 0)
+            return k;
+    return 0;
 }
 
 static void atualizar_luta(Jogo *j, const Intencao in[2], float dt)
@@ -140,6 +157,11 @@ static void atualizar(Jogo *j, float dt)
 
     switch (j->tela) {
     case TELA_MENU: {
+        /* Uma dupla diferente de lutadores a cada MENU_TROCA_LUTADOR. */
+        j->tempo_menu += dt;
+        int dupla = (int)(j->tempo_menu / MENU_TROCA_LUTADOR);
+        for (int i = 0; i < 2; i++)
+            previa_atualizar(&j->previa[i], lutador_do_menu(j, dupla * 2 + i), dt);
         AcaoMenu a = menu_atualizar(&j->menu, in);
         if (a == MENU_JOGAR) {
             selecao_iniciar(&j->selecao);
@@ -202,11 +224,15 @@ static void desenhar(Jogo *j)
     ClearBackground((Color){ 32, 28, 36, 255 });
 
     switch (j->tela) {
-    case TELA_MENU:      menu_desenhar(&j->menu);           break;
+    case TELA_MENU:
+        menu_desenhar(&j->menu);
+        previa_desenhar(&j->previa[0], &j->recursos, menu_area_lutador(0), -MENU_VIRAR, MENU_GIRO);
+        previa_desenhar(&j->previa[1], &j->recursos, menu_area_lutador(1), MENU_VIRAR, MENU_GIRO);
+        break;
     case TELA_SELECAO:
         selecao_desenhar(&j->selecao);
         for (int i = 0; i < 2; i++)
-            previa_desenhar(&j->previa[i], &j->recursos, selecao_area_previa(i));
+            previa_desenhar(&j->previa[i], &j->recursos, selecao_area_previa(i), 0.0f, PREVIA_GIRO);
         break;
     case TELA_MONTAGEM:
         montagem_desenhar(&j->montagem, &j->jogadores[0].combo, &j->jogadores[1].combo);

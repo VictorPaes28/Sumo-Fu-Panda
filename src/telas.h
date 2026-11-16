@@ -33,6 +33,9 @@ void     menu_iniciar(TelaMenu *t);
  * a de qualquer jogador confirma. */
 AcaoMenu menu_atualizar(TelaMenu *t, const Intencao in[2]);
 void     menu_desenhar(const TelaMenu *t);
+/* Onde a tela inicial deixa espaço para um lutador 3D (lado 0 = esquerda,
+ * 1 = direita). O main.c desenha ali as prévias (previa.h), frente a frente. */
+Rectangle menu_area_lutador(int lado);
 
 /* ------------------------------------------------------------- Seleção */
 /* Cada jogador escolhe um personagem do catálogo (personagem.h).

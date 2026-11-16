@@ -57,14 +57,78 @@ AcaoMenu menu_atualizar(TelaMenu *t, const Intencao in[2])
     return MENU_NENHUMA;
 }
 
+/* Medidas e cores da tela inicial. */
+static const float MENU_LUTADOR_L     = 330.0f;  /* área de cada lutador 3D */
+static const float MENU_LUTADOR_A     = 480.0f;
+static const float MENU_LUTADOR_Y     = 196.0f;
+static const float MENU_LUTADOR_BORDA = 40.0f;   /* da borda da tela */
+static const float MENU_BOTAO_L       = 300.0f;
+static const float MENU_BOTAO_A       = 58.0f;
+static const float MENU_BOTAO_Y       = 400.0f;
+static const float MENU_BOTAO_PASSO   = 74.0f;
+static const Color MENU_CEU_CIMA      = { 26, 18, 34, 255 };
+static const Color MENU_CEU_BAIXO     = { 86, 44, 36, 255 };
+static const Color MENU_ARGILA        = { 196, 158, 110, 255 };
+static const Color MENU_PALHA         = { 186, 164, 98, 255 };
+
+Rectangle menu_area_lutador(int lado)
+{
+    float x = (lado == 0) ? MENU_LUTADOR_BORDA
+                          : JANELA_LARGURA - MENU_LUTADOR_BORDA - MENU_LUTADOR_L;
+    return (Rectangle){ x, MENU_LUTADOR_Y, MENU_LUTADOR_L, MENU_LUTADOR_A };
+}
+
+/* Fundo: céu em degradê e, embaixo, o ringue (dohyô) visto de lado: a argila
+ * clara e o anel de palha. */
+static void desenhar_fundo_menu(void)
+{
+    DrawRectangleGradientV(0, 0, JANELA_LARGURA, JANELA_ALTURA, MENU_CEU_CIMA, MENU_CEU_BAIXO);
+    Vector2 centro = { (float)CENTRO_X, JANELA_ALTURA - 40.0f };
+    DrawEllipse((int)centro.x, (int)centro.y, 640.0f, 120.0f, Fade(MENU_ARGILA, 0.85f));
+    for (int k = 0; k < 6; k++)               /* anel de palha, grosso */
+        DrawEllipseLines((int)centro.x, (int)centro.y, 560.0f - k, 98.0f - k * 0.3f, MENU_PALHA);
+    DrawEllipse((int)centro.x, (int)centro.y, 420.0f, 70.0f, Fade(WHITE, 0.08f));
+}
+
+/* Título grande com contorno escuro (desenhado deslocado em volta) e sombra. */
+static void desenhar_titulo_menu(void)
+{
+    const int tamanho = 96, y = 96;
+    for (int dx = -3; dx <= 3; dx += 3)
+        for (int dy = -3; dy <= 3; dy += 3)
+            ui_texto_centro(NOME_JOGO, CENTRO_X + dx, y + dy + 6, tamanho, (Color){ 20, 10, 16, 255 });
+    ui_texto_centro(NOME_JOGO, CENTRO_X, y, tamanho, UI_DESTAQUE);
+    ui_texto_centro_sombra("Sumô com física, no Palácio de Jade", CENTRO_X, y + 112, 26, UI_TEXTO);
+}
+
+/* Botão do menu: o escolhido fica cheio, com borda dourada e setas dos lados. */
+static void desenhar_botao(const char *texto, float y, bool escolhido)
+{
+    Rectangle r = { CENTRO_X - MENU_BOTAO_L / 2.0f, y, MENU_BOTAO_L, MENU_BOTAO_A };
+    if (escolhido) {
+        DrawRectangleRounded(r, 0.35f, 8, Fade(UI_DESTAQUE, 0.22f));
+        DrawRectangleRoundedLinesEx(r, 0.35f, 8, 3.0f, UI_DESTAQUE);
+        float cy = y + MENU_BOTAO_A / 2.0f, s = 10.0f;
+        DrawTriangle((Vector2){ r.x - 26, cy - s }, (Vector2){ r.x - 26, cy + s },
+                     (Vector2){ r.x - 10, cy }, UI_DESTAQUE);
+        DrawTriangle((Vector2){ r.x + r.width + 26, cy - s }, (Vector2){ r.x + r.width + 10, cy },
+                     (Vector2){ r.x + r.width + 26, cy + s }, UI_DESTAQUE);
+    } else {
+        DrawRectangleRounded(r, 0.35f, 8, Fade(BLACK, 0.35f));
+        DrawRectangleRoundedLinesEx(r, 0.35f, 8, 2.0f, UI_BORDA);
+    }
+    ui_texto_centro(texto, CENTRO_X, (int)(y + (MENU_BOTAO_A - 36) / 2), 36,
+                    escolhido ? UI_TEXTO : UI_TEXTO_FRACO);
+}
+
 void menu_desenhar(const TelaMenu *t)
 {
-    ClearBackground(UI_FUNDO);
-    ui_texto_centro(NOME_JOGO, CENTRO_X, 150, 84, UI_DESTAQUE);
-    ui_texto_centro("Sumô com física, no Palácio de Jade", CENTRO_X, 250, 26, UI_TEXTO);
-    desenhar_opcoes(OPCOES_MENU, QTD_OPCOES_MENU, t->opcao, 380);
+    desenhar_fundo_menu();
+    desenhar_titulo_menu();
+    for (int i = 0; i < QTD_OPCOES_MENU; i++)
+        desenhar_botao(OPCOES_MENU[i], MENU_BOTAO_Y + i * MENU_BOTAO_PASSO, i == t->opcao);
     ui_texto_centro("Controle: D-pad escolhe, A confirma   |   Teclado: W/S e C (J1), setas e K (J2)",
-                    CENTRO_X, JANELA_ALTURA - 50, 18, UI_TEXTO_FRACO);
+                    CENTRO_X, JANELA_ALTURA - 36, 18, (Color){ 70, 44, 30, 255 });
 }
 
 /* ------------------------------------------------------------- Seleção */

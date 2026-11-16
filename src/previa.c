@@ -63,11 +63,11 @@ void previa_atualizar(Previa *pv, int personagem, float dt)
         pv->acumulador = 0.0f;
 }
 
-void previa_desenhar(Previa *pv, Recursos *r, Rectangle area)
+void previa_desenhar(Previa *pv, Recursos *r, Rectangle area, float virar, float giro)
 {
     if (pv->personagem < 0)
         return;
-    float angulo = PREVIA_GIRO * sinf(2.0f * PI * pv->tempo / PREVIA_GIRO_PERIODO);
+    float angulo = virar + giro * sinf(2.0f * PI * pv->tempo / PREVIA_GIRO_PERIODO);
     render_previa(&pv->corpo, pv->personagem, pv->jogador, r, pv->imagem, angulo);
 
     /* A textura do OpenGL vem de cabeça para baixo: altura negativa desvira.
