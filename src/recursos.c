@@ -48,6 +48,18 @@ void recursos_carregar(Recursos *r)
             faltando++;
     }
 
+    /* Fonte do título, carregada grande para não borrar ao desenhar. */
+    const char *fonte = TextFormat("%sassets/fontes/Bangers-Regular.ttf", base);
+    /* Sem a lista, a raylib carrega só o ASCII: o "Ô" de SUMÔ virava "?".
+     * Carrega também o Latin-1 (as letras acentuadas do português). */
+    int letras[224];
+    for (int k = 0; k < 224; k++)
+        letras[k] = 32 + k;
+    r->fonte_titulo = FileExists(fonte) ? LoadFontEx(fonte, FONTE_TITULO_CARGA, letras, 224)
+                                        : GetFontDefault();
+    if (!FileExists(fonte))
+        faltando++;
+
     if (faltando > 0)
         TraceLog(LOG_WARNING, "RECURSOS: %d arquivos faltando em assets/ "
                  "(o jogo usa caixas no lugar dos modelos e fica sem esses sons)", faltando);
@@ -64,6 +76,8 @@ void recursos_liberar(Recursos *r)
     for (int p = 0; p < MAX_PERSONAGENS; p++)
         pele_liberar(&r->peles[p]);
     luz_liberar(r->luz);
+    if (r->fonte_titulo.texture.id != GetFontDefault().texture.id)
+        UnloadFont(r->fonte_titulo);
     for (int s = 0; s < SOM_QTD; s++)
         if (r->tem_som[s])
             UnloadSound(r->sons[s]);

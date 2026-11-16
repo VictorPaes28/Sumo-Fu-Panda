@@ -94,7 +94,7 @@ int main(int argc, char **argv)
         BeginDrawing();
         ClearBackground((Color){ 32, 28, 36, 255 });
         switch (tela) {
-        case D_MENU:      menu_desenhar(&menu); break;
+        case D_MENU:      menu_desenhar(&menu, GetFontDefault()); break;
         case D_SELECAO:   selecao_desenhar(&selecao); break;
         case D_MONTAGEM:  montagem_desenhar(&montagem, &combos[0], &combos[1]); break;
         case D_RESULTADO: resultado_desenhar(&resultado); break;

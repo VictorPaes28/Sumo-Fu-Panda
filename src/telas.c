@@ -90,15 +90,20 @@ static void desenhar_fundo_menu(void)
     DrawEllipse((int)centro.x, (int)centro.y, 420.0f, 70.0f, Fade(WHITE, 0.08f));
 }
 
-/* Título grande com contorno escuro (desenhado deslocado em volta) e sombra. */
-static void desenhar_titulo_menu(void)
+/* Título grande na fonte do jogo, com contorno escuro (o texto desenhado
+ * deslocado em volta) e sombra. */
+static void desenhar_titulo_menu(Font fonte)
 {
-    const int tamanho = 96, y = 96;
-    for (int dx = -3; dx <= 3; dx += 3)
-        for (int dy = -3; dy <= 3; dy += 3)
-            ui_texto_centro(NOME_JOGO, CENTRO_X + dx, y + dy + 6, tamanho, (Color){ 20, 10, 16, 255 });
-    ui_texto_centro(NOME_JOGO, CENTRO_X, y, tamanho, UI_DESTAQUE);
-    ui_texto_centro_sombra("Sumô com física, no Palácio de Jade", CENTRO_X, y + 112, 26, UI_TEXTO);
+    const float tamanho = 120.0f, espaco = 4.0f, y = 70.0f;
+    Vector2 medida = MeasureTextEx(fonte, NOME_JOGO, tamanho, espaco);
+    Vector2 pos = { CENTRO_X - medida.x / 2.0f, y };
+    for (int dx = -4; dx <= 4; dx += 4)
+        for (int dy = -4; dy <= 4; dy += 4)
+            DrawTextEx(fonte, NOME_JOGO, (Vector2){ pos.x + dx, pos.y + dy + 7 }, tamanho, espaco,
+                       (Color){ 20, 10, 16, 255 });
+    DrawTextEx(fonte, NOME_JOGO, pos, tamanho, espaco, UI_DESTAQUE);
+    int y_sub = (int)(y + medida.y + 6.0f);
+    ui_texto_centro_sombra("Sumô com física, no Palácio de Jade", CENTRO_X, y_sub, 26, UI_TEXTO);
 }
 
 /* Botão do menu: o escolhido fica cheio, com borda dourada e setas dos lados. */
@@ -121,10 +126,10 @@ static void desenhar_botao(const char *texto, float y, bool escolhido)
                     escolhido ? UI_TEXTO : UI_TEXTO_FRACO);
 }
 
-void menu_desenhar(const TelaMenu *t)
+void menu_desenhar(const TelaMenu *t, Font titulo)
 {
     desenhar_fundo_menu();
-    desenhar_titulo_menu();
+    desenhar_titulo_menu(titulo);
     for (int i = 0; i < QTD_OPCOES_MENU; i++)
         desenhar_botao(OPCOES_MENU[i], MENU_BOTAO_Y + i * MENU_BOTAO_PASSO, i == t->opcao);
     ui_texto_centro("Controle: D-pad escolhe, A confirma   |   Teclado: W/S e C (J1), setas e K (J2)",

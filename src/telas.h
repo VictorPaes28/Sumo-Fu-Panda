@@ -32,7 +32,8 @@ void     menu_iniciar(TelaMenu *t);
 /* direcional_y muda a opção (com volta: de baixo pula para cima);
  * a de qualquer jogador confirma. */
 AcaoMenu menu_atualizar(TelaMenu *t, const Intencao in[2]);
-void     menu_desenhar(const TelaMenu *t);
+/* 'titulo' é a fonte do nome do jogo (Recursos.fonte_titulo). */
+void     menu_desenhar(const TelaMenu *t, Font titulo);
 /* Onde a tela inicial deixa espaço para um lutador 3D (lado 0 = esquerda,
  * 1 = direita). O main.c desenha ali as prévias (previa.h), frente a frente. */
 Rectangle menu_area_lutador(int lado);

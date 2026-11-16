@@ -281,6 +281,7 @@
 #define PREVIA_FOV                32.0f  /* abertura da câmera (graus)            */
 #define PREVIA_GIRO               0.55f  /* na seleção, a câmera vai e volta até este ângulo (rad) */
 #define PREVIA_GIRO_PERIODO       7.0f   /* duração de uma ida e volta (s)        */
+#define FONTE_TITULO_CARGA        128    /* tamanho em que a fonte do título é carregada (px) */
 #define MENU_TROCA_LUTADOR        5.0f   /* no menu, troca a dupla de lutadores a cada (s) */
 #define MENU_VIRAR                0.80f  /* no menu, os lutadores ficam de lado, frente a
                                             frente (rad; ângulo da câmera da prévia) */

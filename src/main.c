@@ -225,7 +225,7 @@ static void desenhar(Jogo *j)
 
     switch (j->tela) {
     case TELA_MENU:
-        menu_desenhar(&j->menu);
+        menu_desenhar(&j->menu, j->recursos.fonte_titulo);
         previa_desenhar(&j->previa[0], &j->recursos, menu_area_lutador(0), -MENU_VIRAR, MENU_GIRO);
         previa_desenhar(&j->previa[1], &j->recursos, menu_area_lutador(1), MENU_VIRAR, MENU_GIRO);
         break;

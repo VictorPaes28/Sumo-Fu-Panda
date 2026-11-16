@@ -39,6 +39,8 @@ typedef struct {
     Pele  peles[MAX_PERSONAGENS];    /* modelo de cada personagem (pode estar vazia) */
     Sound sons[SOM_QTD];
     bool  tem_som[SOM_QTD];
+    Font  fonte_titulo;              /* assets/fontes/Bangers-Regular.ttf (licença
+                                        OFL); faltando, fica a fonte padrão   */
 } Recursos;
 
 /* Carrega os modelos de todos os personagens do catálogo e todos os sons.
