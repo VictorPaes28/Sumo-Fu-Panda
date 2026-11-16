@@ -89,15 +89,20 @@ avisa no console (`PELE: osso ... não existe`).
 
 Gerados no rFXGen (ou outra fonte livre), em `.wav`, em `assets/sons/`:
 
-| Arquivo | Quando toca |
-|---|---|
-| `golpe_leve.wav` | acerto de golpe leve |
-| `golpe_forte.wav` | acerto de golpe forte |
-| `queda.wav` | alguém caiu ou saiu do ringue |
-| `contagem.wav` | cada número do 3, 2, 1 |
-| `lute.wav` | início da luta |
-| `vitoria.wav` | fim da partida |
-| `menu_mover.wav` | mover o cursor nos menus |
-| `menu_confirmar.wav` | confirmar nos menus |
+| Arquivo | Quando toca | Origem |
+|---|---|---|
+| `golpe_leve.wav` | acerto de golpe leve | gerado no rFXGen |
+| `golpe_forte.wav` | acerto de golpe forte | gerado no rFXGen |
+| `queda.wav` | alguém caiu ou saiu do ringue | gerado no rFXGen |
+| `contagem.wav` | cada número do 3, 2, 1 | gerado no rFXGen |
+| `lute.wav` | início da luta | gerado no rFXGen |
+| `vitoria.wav` | fim da partida | gerado no rFXGen |
+| `menu_mover.wav` | mover o cursor nos menus | gerado no rFXGen |
+| `menu_confirmar.wav` | confirmar nos menus | gerado no rFXGen |
+
+Origem: os 8 sons foram gerados pelo grupo no **rFXGen** (versão no navegador,
+https://raylibtech.itch.io/rfxgen) em 2026-11-14, a partir dos presets e com os parâmetros
+ajustados à mão. Nenhum som veio da internet. Formato: WAV, 44100 Hz, 16 bits, mono;
+até 1 s cada (a `vitoria`, até 2 s); a pasta inteira tem cerca de 230 KB.
 
 Arquivo faltando não quebra o jogo: ele só fica sem aquele som ou modelo (desenha caixas).
