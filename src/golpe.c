@@ -106,15 +106,28 @@ static const ChaveGolpe CHAVES_LEVANTADOR[] = {
  * A direita continua na guarda. O pe esquerdo avanca durante o giro. */
 static const ChaveGolpe CHAVES_TAPA_LATERAL[] = {
     CHAVE(0.00f, 0, 0, [ART_OMBRO_E] = { 0, 0 }),
-    CHAVE(0.18f, -0.48f, 0, [ART_OMBRO_E] = { 1.12f, -0.52f }, PERNAS(0.08f, 0.08f)),
-    CHAVE(0.28f, -0.48f, 0, [ART_OMBRO_E] = { 1.12f, -0.52f }, PERNAS(0.08f, 0.08f)),
-    CHAVE(0.39f, -0.38f, 0, [ART_OMBRO_E] = { 1.55f, 0.24f },
+    CHAVE((0.18f / 1.4f), -0.48f, 0, [ART_OMBRO_E] = { 1.12f, -0.52f }, PERNAS(0.08f, 0.08f)),
+    CHAVE((0.28f / 1.4f), -0.48f, 0, [ART_OMBRO_E] = { 1.12f, -0.52f }, PERNAS(0.08f, 0.08f)),
+    CHAVE((0.39f / 1.4f), -0.38f, 0, [ART_OMBRO_E] = { 1.55f, 0.24f },
           PERNA_E(0.16f, 0.21f), PERNA_D(-0.08f, -0.03f)),
-    CHAVE(0.52f, -0.10f, 0, [ART_OMBRO_E] = { 2.05f, 0.50f },
+    CHAVE((0.52f / 1.4f), -0.10f, 0, [ART_OMBRO_E] = { 2.05f, 0.50f },
           [ART_CINTURA] = { -0.10f, -0.08f }, PERNA_E(0.19f, 0.11f), PERNA_D(-0.11f, -0.07f)),
-    CHAVE(0.69f, -0.10f, 0, [ART_OMBRO_E] = { 2.05f, 0.50f },
+    CHAVE((0.69f / 1.4f), -0.10f, 0, [ART_OMBRO_E] = { 2.05f, 0.50f },
           [ART_CINTURA] = { -0.10f, -0.08f }, PERNA_E(0.19f, 0.11f), PERNA_D(-0.11f, -0.07f)),
-    CHAVE(0.90f, 0, 0, [ART_OMBRO_E] = { 0, 0 }),
+    CHAVE((0.90f / 1.4f), 0, 0, [ART_OMBRO_E] = { 0, 0 }),
+};
+
+static const ChaveGolpe CHAVES_TAPA_DIREITA[] = {
+    CHAVE(0.00f, 0, 0, [ART_OMBRO_D] = { 0, 0 }),
+    CHAVE((0.18f / 1.4f), 0, -0.48f, [ART_OMBRO_D] = { 1.12f, -0.52f }, PERNAS(0.08f, 0.08f)),
+    CHAVE((0.28f / 1.4f), 0, -0.48f, [ART_OMBRO_D] = { 1.12f, -0.52f }, PERNAS(0.08f, 0.08f)),
+    CHAVE((0.39f / 1.4f), 0, -0.38f, [ART_OMBRO_D] = { 1.55f, 0.24f },
+          PERNA_D(0.16f, 0.21f), PERNA_E(-0.08f, -0.03f)),
+    CHAVE((0.52f / 1.4f), 0, -0.10f, [ART_OMBRO_D] = { 2.05f, 0.50f },
+          [ART_CINTURA] = { -0.10f, 0.08f }, PERNA_D(0.19f, 0.11f), PERNA_E(-0.11f, -0.07f)),
+    CHAVE((0.69f / 1.4f), 0, -0.10f, [ART_OMBRO_D] = { 2.05f, 0.50f },
+          [ART_CINTURA] = { -0.10f, 0.08f }, PERNA_D(0.19f, 0.11f), PERNA_E(-0.11f, -0.07f)),
+    CHAVE((0.90f / 1.4f), 0, 0, [ART_OMBRO_D] = { 0, 0 }),
 };
 
 /* Barrigada: abre os bracos ao agachar, salta de peito aberto e amortece a queda. */
@@ -141,14 +154,14 @@ static const ChaveGolpe CHAVES_BARRIGADA[] = {
  * A cabeça não bate: com ela o choque parecia dois bonecos batendo a
  * cabeça (parte_ataque é só o tronco). */
 static const ChaveGolpe CHAVES_INVESTIDA[] = {
-    CHAVE(0.00f, 0.0f, 0.0f, [ART_CINTURA] = { 0.0f, 0.0f }),
-    CHAVE(0.16f, -0.25f, -0.25f, [ART_CINTURA] = { 0.41f, 0.0f }, [ART_PESCOCO] = { 0.20f, 0.0f },
-          BRACOS(-0.30f, -0.15f), PERNAS(0.45f, 0.45f), PES(0.15f)),
-    CHAVE(0.26f, 0.65f, 0.65f, [ART_CINTURA] = { 0.41f, 0.0f }, [ART_PESCOCO] = { 0.25f, 0.0f },
-          BRACOS(0.50f, 0.70f), PERNAS(-0.10f, -0.30f), PES(-0.30f)),
-    CHAVE(0.46f, 0.50f, 0.50f, [ART_CINTURA] = { 0.35f, 0.0f }, [ART_PESCOCO] = { 0.20f, 0.0f },
-          BRACOS(0.45f, 0.65f), PERNAS(0.00f, -0.15f)),
-    CHAVE(0.90f, 0.0f, 0.0f, [ART_CINTURA] = { 0.0f, 0.0f }),
+    CHAVE(0.00f, 0, 0, BRACOS(0, 0)),
+    CHAVE(0.18f, 0.30f, 0.30f, BRACOS(0.20f, 0.50f),
+          PERNAS(0.25f, 0.25f)),
+    CHAVE(0.40f, -0.70f, -0.70f, BRACOS(1.05f, 1.02f),
+          PERNA_E(-0.18f, -0.12f), PERNA_D(0.70f, 0.24f), PES(-0.15f)),
+    CHAVE(1.40f, -0.70f, -0.70f, BRACOS(1.05f, 1.02f),
+          PERNA_E(-0.18f, -0.12f), PERNA_D(0.55f, 0.16f)),
+    CHAVE(1.65f, 0, 0, BRACOS(0, 0)),
 };
 
 /* Empurrar para fora = oshi-dashi: as duas palmas no peito do outro, ao
@@ -173,23 +186,18 @@ static const ChaveGolpe CHAVES_EMPURRAR_FORA[] = {
     CHAVE(0.70f, 0.0f, 0.0f, [ART_CINTURA] = { 0.0f, 0.0f }),
 };
 
-/* Forçar para fora = yori-kiri: segura a faixa do outro com as duas mãos
- * (cotovelos dobrados, puxando-o contra o peito) e anda com ele para fora,
- * em passos curtos alternados, quadril baixo.
- *   0,12  mãos baixas na faixa; 0,25 / 0,40 / 0,55 três passos; 0,95 guarda. */
+/* Harite: dois tapas frontais, primeiro esquerda e depois direita. */
 static const ChaveGolpe CHAVES_FORCAR_FORA[] = {
-    CHAVE(0.00f, 0.0f, 0.0f, [ART_CINTURA] = { 0.0f, 0.0f }),
-    CHAVE(0.12f, 1.10f, 1.10f, [ART_CINTURA] = { 0.20f, 0.0f }, BRACOS(0.15f, 0.55f),
-          PERNAS(0.30f, 0.30f)),
-    CHAVE(0.25f, 1.25f, 1.25f, [ART_CINTURA] = { 0.18f, 0.0f }, BRACOS(0.05f, 0.40f),
-          PERNA_E(0.10f, 0.15f), PERNA_D(0.40f, 0.30f), PES(-0.15f)),
-    CHAVE(0.40f, 1.25f, 1.25f, [ART_CINTURA] = { 0.18f, 0.0f }, BRACOS(0.05f, 0.40f),
-          PERNA_E(0.40f, 0.30f), PERNA_D(0.10f, 0.15f), PES(-0.15f)),
-    CHAVE(0.55f, 1.25f, 1.25f, [ART_CINTURA] = { 0.20f, 0.0f }, BRACOS(0.05f, 0.40f),
-          PERNA_E(0.10f, 0.15f), PERNA_D(0.40f, 0.30f), PES(-0.15f)),
-    CHAVE(0.72f, 0.60f, 0.60f, [ART_CINTURA] = { 0.10f, 0.0f }, BRACOS(0.10f, 0.45f),
-          PERNAS(0.15f, 0.15f)),
-    CHAVE(0.95f, 0.0f, 0.0f, [ART_CINTURA] = { 0.0f, 0.0f }),
+    CHAVE(0.00f, 0, 0, BRACOS(0, 0)),
+    CHAVE(0.16f, -0.50f, 0.55f, [ART_OMBRO_E] = { 1.20f, 1.05f },
+          [ART_OMBRO_D] = { 0.10f, 0.35f }, PERNA_E(0.38f, 0.20f)),
+    CHAVE(0.26f, -0.50f, 0.55f, [ART_OMBRO_E] = { 1.20f, 1.05f },
+          [ART_OMBRO_D] = { 0.10f, 0.35f }, PERNA_E(0.38f, 0.20f)),
+    CHAVE(0.39f, 0.55f, -0.50f, [ART_OMBRO_E] = { 0.10f, 0.35f },
+          [ART_OMBRO_D] = { 1.20f, 1.05f }, PERNA_D(0.38f, 0.20f)),
+    CHAVE(0.50f, 0.55f, -0.50f, [ART_OMBRO_E] = { 0.10f, 0.35f },
+          [ART_OMBRO_D] = { 1.20f, 1.05f }, PERNA_D(0.38f, 0.20f)),
+    CHAVE(0.72f, 0, 0, BRACOS(0, 0)),
 };
 
 /* Projeção por cima = uwate-nage: a mão ESQUERDA pega a faixa por cima do
@@ -310,12 +318,12 @@ static const Golpe CATALOGO[GOLPE_QTD] = {
         .no_peito = false,
     },
     [GOLPE_TAPA_LATERAL] = {
-        .nome = "Tapa lateral",
+        .nome = "Tapa esquerda",
         .descricao = "Tapa de esquerda com giro para a direita.",
         .chaves = CHAVES_TAPA_LATERAL, .qtd_chaves = QTD(CHAVES_TAPA_LATERAL),
-        .tempo_preparo = 0.28f,
-        .tempo_ativo = 0.41f,
-        .duracao = 0.90f,
+        .tempo_preparo = (0.28f / 1.4f),
+        .tempo_ativo = (0.41f / 1.4f),
+        .duracao = (0.90f / 1.4f),
         .parte_ataque = PARTE_ANTEBRACO_E,
         .parte_ataque_2 = PARTE_BRACO_E,   /* o braço todo chicoteia */
         .avanco = 0.0f,
@@ -341,7 +349,7 @@ static const Golpe CATALOGO[GOLPE_QTD] = {
         .impulso = 310.0f,
         .impulso_vertical = 30.0f,
         .impulso_lateral = 0.0f,
-        .dano = 15.0f,
+        .dano = 7.5f,
         .tempo_cura = 8.0f,
         .custo_stamina = 30.0f,
         .forte = true,
@@ -351,16 +359,16 @@ static const Golpe CATALOGO[GOLPE_QTD] = {
         .nome = "Investida",
         .descricao = "Avança com o corpo todo.",
         .chaves = CHAVES_INVESTIDA, .qtd_chaves = QTD(CHAVES_INVESTIDA),
-        .tempo_preparo = 0.22f,
-        .tempo_ativo = 0.30f,
-        .duracao = 0.90f,
+        .tempo_preparo = 0.18f,
+        .tempo_ativo = 1.22f,
+        .duracao = 1.65f,
         .parte_ataque = PARTE_TRONCO,
         .parte_ataque_2 = PARTE_ANTEBRACO_D, /* antebraços sobem contra o peito */
-        .avanco = 120.0f,
+        .avanco = 150.0f,
         .impulso = 360.0f,
         .impulso_vertical = 0.0f,
         .impulso_lateral = 0.0f,
-        .dano = 12.0f,
+        .dano = 4.0f,
         .tempo_cura = 6.0f,
         .custo_stamina = 35.0f,
         .forte = true,
@@ -386,27 +394,26 @@ static const Golpe CATALOGO[GOLPE_QTD] = {
         .no_peito = true,
     },
     [GOLPE_FORCAR_FORA] = {
-        .nome = "Forçar fora",
-        .descricao = "Segura a faixa e anda com ele para fora.",
+        .nome = "Harite",
+        .descricao = "Dois tapas frontais, esquerda e direita.",
         .chaves = CHAVES_FORCAR_FORA, .qtd_chaves = QTD(CHAVES_FORCAR_FORA),
-        .tempo_preparo = 0.12f,
-        .tempo_ativo = 0.50f,           /* acerta em qualquer dos passos */
-        .duracao = 0.95f,
+        .tempo_preparo = 0.10f,
+        .tempo_ativo = 0.45f,
+        .duracao = 0.72f,
         .parte_ataque = PARTE_ANTEBRACO_D,
         .parte_ataque_2 = PARTE_ANTEBRACO_E,
         .avanco = 110.0f,
-        .impulso = 260.0f,
+        .impulso = 90.0f,
         .impulso_vertical = 20.0f,
         .impulso_lateral = 0.0f,
-        .dano = 9.0f,
+        .dano = 4.0f,
         .tempo_cura = 5.0f,
-        .custo_stamina = 28.0f,
-        .forte = true,
-        .no_peito = true,
-        .agarra = true,
+        .custo_stamina = 14.0f,
+        .forte = false,
+        .no_peito = false,
     },
     [GOLPE_PROJECAO_CIMA] = {
-        .nome = "Projeção cima",
+        .nome = "Ippon direita",
         .descricao = "Pega a faixa por cima e joga de lado.",
         .chaves = CHAVES_PROJECAO_CIMA, .qtd_chaves = QTD(CHAVES_PROJECAO_CIMA),
         .tempo_preparo = 0.16f,
@@ -427,7 +434,7 @@ static const Golpe CATALOGO[GOLPE_QTD] = {
         .agarra = true,
     },
     [GOLPE_PROJECAO_BAIXO] = {
-        .nome = "Projeção baixo",
+        .nome = "Ippon esquerda",
         .descricao = "Pega por baixo do braço e derruba de lado.",
         .chaves = CHAVES_PROJECAO_BAIXO, .qtd_chaves = QTD(CHAVES_PROJECAO_BAIXO),
         .tempo_preparo = 0.16f,
@@ -448,22 +455,21 @@ static const Golpe CATALOGO[GOLPE_QTD] = {
         .agarra = true,
     },
     [GOLPE_TAPA_BAIXO] = {
-        .nome = "Tapa p/ baixo",
-        .descricao = "Contra-ataque: use quando ele vier para cima.",
-        .chaves = CHAVES_TAPA_BAIXO, .qtd_chaves = QTD(CHAVES_TAPA_BAIXO),
-        .tempo_preparo = 0.12f,
-        .tempo_ativo = 0.16f,
-        .duracao = 0.55f,
+        .nome = "Tapa direita",
+        .descricao = "Tapa de direita com giro para a esquerda.",
+        .chaves = CHAVES_TAPA_DIREITA, .qtd_chaves = QTD(CHAVES_TAPA_DIREITA),
+        .tempo_preparo = (0.28f / 1.4f),
+        .tempo_ativo = (0.41f / 1.4f),
+        .duracao = (0.90f / 1.4f),
         .parte_ataque = PARTE_ANTEBRACO_D,
-        .parte_ataque_2 = PARTE_ANTEBRACO_E,
-        .avanco = -40.0f,               /* recua saindo da frente */
-        .impulso = -220.0f,             /* puxa para a frente: ele passa direto */
-        .impulso_vertical = -320.0f,
-        .impulso_lateral = -180.0f,     /* de lado: ele passa pela esquerda */
-        .derruba = 0.8f,
-        .dano = 8.0f,
-        .tempo_cura = 4.0f,
-        .custo_stamina = 18.0f,
+        .parte_ataque_2 = PARTE_BRACO_D,   /* o braço todo chicoteia */
+        .avanco = 0.0f,
+        .impulso = 60.0f,
+        .impulso_vertical = 0.0f,
+        .impulso_lateral = -130.0f,
+        .dano = 4.0f,
+        .tempo_cura = 2.5f,
+        .custo_stamina = 10.0f,
         .forte = false,
         .no_peito = false,
     },

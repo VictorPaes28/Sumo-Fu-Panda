@@ -399,9 +399,14 @@ static void animar(Corpo *c, Pose *alvo)
             float sobe = fmaxf(0.0f, sinf(fase));
             float alcance = -cosf(fase) * pernas;
             float lateral = Vector2DotProduct(dir, esquerda) * (lado ? -1.0f : 1.0f);
-            alvo->alvo[quadril][0] += alcance * para_frente + sobe * pernas * 0.55f;
+            /* Ao recuar, levar a coxa para a frente anulava o passo para
+             * tras. Reduz a elevacao da coxa e deixa o joelho liberar o pe. */
+            float recuo = fmaxf(0.0f, -para_frente);
+            float elevacao = 0.55f * (1.0f - 0.85f * recuo);
+            alvo->alvo[quadril][0] += alcance * para_frente * (1.0f - 0.25f * recuo)
+                                      + sobe * pernas * elevacao;
             alvo->alvo[quadril][1] += 0.35f * alcance * lateral;
-            alvo->alvo[joelho][0] += sobe * pernas * 1.3f;
+            alvo->alvo[joelho][0] += sobe * pernas * (1.3f - 0.35f * recuo);
             ParteCorpo pe = lado ? PARTE_PE_D : PARTE_PE_E;
             ParteCorpo apoio = lado ? PARTE_PE_E : PARTE_PE_D;
             c->refs[pe].apoio_marcha = (0.35f + 0.65f * fmaxf(0.0f, -sinf(fase))) * peso;
@@ -411,7 +416,7 @@ static void animar(Corpo *c, Pose *alvo)
                 dBodyID livre = c->pecas[pe], outro = c->pecas[apoio];
                 float altura = dBodyGetPosition(livre)[1] - dBodyGetPosition(outro)[1];
                 float vel_y = dBodyGetLinearVel(livre)[1] - dBodyGetLinearVel(outro)[1];
-                float alvo_y = MARCHA_ALTURA * sinf(fase) * peso;
+                float alvo_y = MARCHA_ALTURA * sinf(fase) * peso * (1.0f - 0.25f * recuo);
                 float massa = c->personagem->massa[PARTE_BACIA];
                 float carga = massa * Clamp(MARCHA_MOLA * (alvo_y - altura) -
                                             MARCHA_AMORTECIMENTO * vel_y, -42.0f, 42.0f);
@@ -980,7 +985,7 @@ void corpo_impulso(Corpo *c, Vector3 impulso)
     }
 }
 
-void corpo_guiar_tapa(Corpo *c, const Corpo *oponente, float arco, float peso)
+void corpo_guiar_tapa(Corpo *c, const Corpo *oponente, float arco, float peso, bool direita)
 {
     Vector3 base = corpo_posicao(c);
     Matrix cabeca = corpo_transformacao(oponente, PARTE_CABECA);
@@ -988,7 +993,7 @@ void corpo_guiar_tapa(Corpo *c, const Corpo *oponente, float arco, float peso)
     Vector3 linha = { rosto.x - base.x, 0, rosto.z - base.z };
     if (Vector3Length(linha) < 0.05f) return;
     Vector3 frente = Vector3Normalize(linha);
-    float giro = -30.0f * DEG2RAD * arco * peso;
+    float giro = (direita ? 30.0f : -30.0f) * DEG2RAD * arco * peso;
     Vector3 rumo = Vector3RotateByAxisAngle(frente, (Vector3){0, 1, 0}, giro);
     /* O chao resiste ao giro. Cada pe e a bacia miram o mesmo rumo,
      * freando conforme chegam ao angulo em vez de rodar por impulso. */
@@ -1006,12 +1011,12 @@ void corpo_guiar_tapa(Corpo *c, const Corpo *oponente, float arco, float peso)
     /* Fecha o arco da mao sobre o rosto. Fora de alcance, termina o
      * gesto no ar. A forca limitada permite que a guarda bloqueie a mao. */
     const Personagem *p = c->personagem;
-    float alcance = p->tamanho[PARTE_BRACO_E][0] + p->tamanho[PARTE_ANTEBRACO_E][0];
+    float alcance = p->tamanho[direita ? PARTE_BRACO_D : PARTE_BRACO_E][0] + p->tamanho[direita ? PARTE_ANTEBRACO_D : PARTE_ANTEBRACO_E][0];
     Vector3 alvo = Vector3Add(base, Vector3Scale(frente, fminf(Vector3Length(linha), alcance)));
     alvo.y = rosto.y;
-    Matrix antebraco = corpo_transformacao(c, PARTE_ANTEBRACO_E);
-    Vector3 mao = Vector3Transform((Vector3){p->tamanho[PARTE_ANTEBRACO_E][0] * 0.5f, 0, 0}, antebraco);
-    dBodyID braco = c->pecas[PARTE_ANTEBRACO_E];
+    Matrix antebraco = corpo_transformacao(c, direita ? PARTE_ANTEBRACO_D : PARTE_ANTEBRACO_E);
+    Vector3 mao = Vector3Transform((Vector3){p->tamanho[direita ? PARTE_ANTEBRACO_D : PARTE_ANTEBRACO_E][0] * (direita ? -0.5f : 0.5f), 0, 0}, antebraco);
+    dBodyID braco = c->pecas[direita ? PARTE_ANTEBRACO_D : PARTE_ANTEBRACO_E];
     dVector3 v;
     dBodyGetPointVel(braco, mao.x, mao.y, mao.z, v);
     Vector3 relativa = Vector3Subtract(vetor_ode(v), vetor_ode(dBodyGetLinearVel(c->pecas[PARTE_BACIA])));
@@ -1025,11 +1030,11 @@ void corpo_guiar_tapa(Corpo *c, const Corpo *oponente, float arco, float peso)
     dBodyAddForceAtPos(braco, forca.x, forca.y, forca.z, mao.x, mao.y, mao.z);
 }
 
-void corpo_sustentar(const Corpo *c, Corpo *outro)
+void corpo_sustentar(const Corpo *c, Corpo *outro, float altura)
 {
     Vector3 frente = corpo_frente(c);
     Vector3 onde = Vector3Add(corpo_posicao(c), Vector3Scale(frente, 0.70f));
-    onde.y += 0.42f + outro->personagem->centro[PARTE_BACIA][1]
+    onde.y += altura + outro->personagem->centro[PARTE_BACIA][1]
                     - c->personagem->centro[PARTE_BACIA][1];
     Vector3 erro = Vector3Subtract(onde, corpo_posicao(outro));
     Vector3 vel = vetor_ode(dBodyGetLinearVel(outro->pecas[PARTE_BACIA]));
@@ -1037,6 +1042,9 @@ void corpo_sustentar(const Corpo *c, Corpo *outro)
     Vector3 acel = Vector3Subtract(Vector3Scale(erro, 55.0f), Vector3Scale(relativa, 12.0f));
     acel.y -= FISICA_GRAVIDADE;
     acel = Vector3ClampValue(acel, 0.0f, 32.0f);
+    /* Mantem o tronco e a bacia verticais enquanto e colocado no chao. */
+    mola_de_equilibrio(outro->pecas[PARTE_BACIA], 650.0f, (Vector2){0, 0});
+    mola_de_equilibrio(outro->pecas[PARTE_TRONCO], 900.0f, (Vector2){0, 0});
     for (int i = 0; i < PARTE_QTD; i++) {
         Vector3 f = Vector3Scale(acel, outro->personagem->massa[i]);
         dBodyAddForce(outro->pecas[i], f.x, f.y, f.z);

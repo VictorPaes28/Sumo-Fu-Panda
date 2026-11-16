@@ -37,6 +37,9 @@ Intencao entrada_ler_dispositivo(int jogador, int controle);
 void render_cena_arena(const Partida *p, Recursos *r, const CameraLuta *c, bool depuracao, int arena);
 void render_arena_previa(RenderTexture2D alvo, int arena);
 
+int montagem_catalogo_quantidade(void);
+TipoGolpe montagem_catalogo_golpe(int indice);
+
 static const char *const ARENAS[] = { "Ginásio Imperial", "Pátio de Jade", "Bosque de Bambu" };
 
 static const float PAUSA_PREVIA_GOLPE = 0.65f;
@@ -427,12 +430,12 @@ static void atualizar_previas_golpes(Jogo *j, const int anterior[2], float dt)
     for (int i = 0; i < 2; i++) {
         PreviaGolpe *pv = &j->previa_golpe[i];
         int cursor = j->montagem.cursor_catalogo[i];
-        const Golpe *g = golpe_dados((TipoGolpe)cursor);
+        const Golpe *g = golpe_dados(montagem_catalogo_golpe(cursor));
         float *tempo = &j->tempo_golpe_previa[i];
         if (!pv->ativa || cursor != anterior[i] || pv->fim >= PAUSA_PREVIA_GOLPE) {
             *tempo = 0.0f;
             if (!reiniciar_previa_golpe(pv, j->jogadores[i].personagem,
-                                       j->jogadores[1-i].personagem, (TipoGolpe)cursor))
+                                       j->jogadores[1-i].personagem, montagem_catalogo_golpe(cursor)))
                 continue;
         }
 
@@ -994,19 +997,21 @@ static void apresentacao_montagem_desenhar(const Jogo *j)
         float x = 28 + i*630;
         const Combo *c = &j->jogadores[i].combo;
         int cursor = j->montagem.cursor_catalogo[i];
-        const Golpe *g = golpe_dados((TipoGolpe)cursor);
+        const Golpe *g = golpe_dados(montagem_catalogo_golpe(cursor));
         apresentacao_painel((Rectangle){x, 144, 594, 520}, j->montagem.pronto[i]);
         apresentacao_ajustado(j, j->nomes[i], (Rectangle){x+16, 158, 410, 30}, 27, apresentacao_cor(i));
         apresentacao_texto(j, j->montagem.pronto[i] ? "PRONTO" : TextFormat("%d/%d golpes", c->tamanho, COMBO_MAX), x+442, 164, 21, j->montagem.pronto[i] ? GREEN : LIGHTGRAY);
+        int qtd = montagem_catalogo_quantidade();
+        int visiveis = qtd < 7 ? qtd : 7;
         int primeiro = cursor - 3;
         if (primeiro < 0) primeiro = 0;
-        if (primeiro > GOLPE_QTD-7) primeiro = GOLPE_QTD-7;
-        for (int k = primeiro; k < primeiro+7 && k < GOLPE_QTD; k++) {
+        if (primeiro > qtd-visiveis) primeiro = qtd-visiveis;
+        for (int k = primeiro; k < primeiro+visiveis && k < qtd; k++) {
             float y = 205 + (k-primeiro)*32;
             if (k == cursor) DrawRectangleRounded((Rectangle){x+12, y-2, 198, 30}, 0.15f, 4, (Color){87, 63, 40, 255});
-            apresentacao_ajustado(j, golpe_dados((TipoGolpe)k)->nome, (Rectangle){x+20,y,180,28}, 22, k == cursor ? apresentacao_cor(0) : LIGHTGRAY);
+            apresentacao_ajustado(j, golpe_dados(montagem_catalogo_golpe(k))->nome, (Rectangle){x+20,y,180,28}, 22, k == cursor ? apresentacao_cor(0) : LIGHTGRAY);
         }
-        apresentacao_texto(j, TextFormat("%d-%d de %d  (cima/baixo)", primeiro+1, primeiro+7, GOLPE_QTD), x+19, 433, 16, LIGHTGRAY);
+        apresentacao_texto(j, TextFormat("%d-%d de %d  (cima/baixo)", primeiro+1, primeiro+visiveis, qtd), x+19, 433, 16, LIGHTGRAY);
         if (j->previa_golpe[i].ativa) desenhar_textura(j->previa_golpe[i].imagem, (Rectangle){x+218, 203, 360, 174});
         apresentacao_texto(j, TextFormat("Energia %.0f   ·   Dano base %.0f%%", g->custo_stamina, g->dano), x+224, 386, 20, apresentacao_cor(i));
         apresentacao_texto(j, TextFormat("Preparo %.2fs   /   Total %.2fs", g->tempo_preparo, g->duracao), x+224, 415, 19, LIGHTGRAY);

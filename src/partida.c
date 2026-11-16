@@ -77,18 +77,20 @@ static void simular(Partida *p, float dt)
         lutador_passo_fisica(&p->lutadores[1]);
         for (int i = 0; lutando && i < 2; i++) {
             Lutador *l = &p->lutadores[i];
-            if (l->estado == LUTADOR_GOLPEANDO && l->golpe_atual == golpe_dados(GOLPE_TAPA_LATERAL)) {
+            if (l->estado == LUTADOR_GOLPEANDO && (l->golpe_atual == golpe_dados(GOLPE_TAPA_LATERAL) || l->golpe_atual == golpe_dados(GOLPE_TAPA_BAIXO))) {
                 const Golpe *g = l->golpe_atual;
                 float t = l->tempo_golpe - g->tempo_preparo;
                 if (t >= 0.0f) {
-                    float arco = Clamp(t / 0.21f, 0, 1);
-                    float peso = Clamp((g->duracao - l->tempo_golpe) / 0.20f, 0, 1);
-                    corpo_guiar_tapa(&l->corpo, &p->lutadores[1-i].corpo, arco, peso);
+                    float arco = Clamp(t / (0.21f / 1.4f), 0, 1);
+                    float peso = Clamp((g->duracao - l->tempo_golpe) / (0.20f / 1.4f), 0, 1);
+                    corpo_guiar_tapa(&l->corpo, &p->lutadores[1-i].corpo, arco, peso, l->golpe_atual == golpe_dados(GOLPE_TAPA_BAIXO));
                 }
             }
             if (l->estado == LUTADOR_GOLPEANDO && l->golpe_acertou &&
-                l->golpe_atual == golpe_dados(GOLPE_LEVANTADOR) && l->tempo_golpe <= 2.50f)
-                corpo_sustentar(&l->corpo, &p->lutadores[1 - i].corpo);
+                l->golpe_atual == golpe_dados(GOLPE_LEVANTADOR) && l->tempo_golpe <= 2.84f) {
+                float descida = Clamp((l->tempo_golpe - 2.50f) / 0.34f, 0.0f, 1.0f);
+                corpo_sustentar(&l->corpo, &p->lutadores[1 - i].corpo, 0.42f * (1.0f - descida));
+            }
         }
         fisica_passo(&p->fisica);
         for (int i = 0; i < 2; i++) {

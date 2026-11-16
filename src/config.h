@@ -142,7 +142,7 @@
 #define EQUILIBRIO_MINIMO         0.25f  /* multiplicador da mola com dano máximo (0 a 1) */
 #define EQUILIBRIO_FIRMADO        1.6f   /* multiplicador extra da mola ao firmar */
 #define FIRMADO_VELOCIDADE        0.35f  /* fração da velocidade ao andar firmado */
-#define IMPULSO_POR_DANO          0.015f /* +1,5% de impulso recebido por ponto de dano */
+#define IMPULSO_POR_DANO          0.005f /* +0,5% de impulso recebido por ponto de dano */
 #define DANO_ESCALA_SEGUIDOS      0.6f   /* cada golpe seguido vale isto do anterior
                                             (100%, 60%, 36%, 22%...) */
 #define DANO_JANELA_SEGUIDOS      1.5f   /* sem levar golpe por este tempo, a sequência

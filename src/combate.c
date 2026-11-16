@@ -30,9 +30,19 @@ void combate_processar(Lutador lut[2], const Fisica *f, double relogio, EventosC
 
             Lutador *atacante = &lut[atk.lutador];
             Lutador *defensor = &lut[alvo.lutador];
+            /* Protege quem esta sustentando o oponente no Levantador. */
+            if (defensor->estado == LUTADOR_GOLPEANDO && defensor->golpe_acertou &&
+                defensor->golpe_atual == golpe_dados(GOLPE_LEVANTADOR) &&
+                defensor->tempo_golpe <= 2.50f)
+                continue;
             /* Só a fase ativa acerta: o braço indo para trás no preparo não conta. */
             if (lutador_fase_golpe(atacante) != FASE_ATIVO || atacante->golpe_acertou)
                 continue;
+            if (atacante->golpe_atual == golpe_dados(GOLPE_FORCAR_FORA)) {
+                ParteCorpo mao = atacante->tempo_golpe < 0.30f
+                                   ? PARTE_ANTEBRACO_E : PARTE_ANTEBRACO_D;
+                if (atk.parte != mao) continue;
+            }
             if (!eh_peca_de_ataque(atacante, atk.parte))
                 continue;
             if (defensor->estado == LUTADOR_CAIDO || defensor->estado == LUTADOR_FORA)
@@ -114,7 +124,7 @@ void combate_aplicar_golpe(Lutador *atacante, Lutador *alvo,
     float escala = powf(DANO_ESCALA_SEGUIDOS, (float)alvo->golpes_seguidos);
     alvo->golpes_seguidos++;
     alvo->ultimo_golpe_recebido = relogio;
-    hematomas_inserir(&alvo->hematomas, g->dano * escala, relogio + g->tempo_cura);
+    hematomas_inserir(&alvo->hematomas, g->dano * escala, relogio + 3.0f * g->tempo_cura);
 
     Vector3 dir = Vector3Subtract(corpo_posicao(&alvo->corpo), corpo_posicao(&atacante->corpo));
     dir.y = 0.0f;

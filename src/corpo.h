@@ -127,7 +127,7 @@ void    corpo_passo(Corpo *c);
  * Usado no avanço dos golpes e no empurrão de um acerto. */
 void    corpo_impulso(Corpo *c, Vector3 impulso);
 /* Sustenta o adversario em frente ao lutador durante o Levantador. */
-void    corpo_sustentar(const Corpo *c, Corpo *outro);
+void    corpo_sustentar(const Corpo *c, Corpo *outro, float altura);
 
 /* Impulso num PONTO da peça (N.s, ponto no mundo): empurra e também gira a
  * peça, como uma força de verdade (um golpe na cabeça tomba mais que um na

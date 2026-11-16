@@ -132,7 +132,11 @@ bool lutador_comandar(Lutador *l, const Intencao *in, Vector3 posicao_adversario
      * Durante o golpe e cambaleando, anda bem menos. */
     l->firmando = in->firmar;
     Vector2 desejada = tela_para_chao(in->mover);
-    if (l->estado == LUTADOR_GOLPEANDO) desejada = Vector2Scale(desejada, 0.3f);
+    if (l->estado == LUTADOR_GOLPEANDO) {
+        bool carregando = l->golpe_atual == golpe_dados(GOLPE_LEVANTADOR)
+                           && l->golpe_acertou && l->tempo_golpe <= 2.50f;
+        desejada = Vector2Scale(desejada, carregando ? 0.85f : 0.3f);
+    }
     if (l->atordoado > 0.0f)            desejada = Vector2Scale(desejada, 0.4f);
     float k = 1.0f - expf(-ENTRADA_SUAVIZACAO * dt);
     l->direcao_suave = Vector2Add(l->direcao_suave,
@@ -194,6 +198,10 @@ static void atualizar_golpe(Lutador *l, float dt)
     if (g == golpe_dados(GOLPE_EMPURRAO) && l->tempo_golpe < 0.43f &&
         l->tempo_golpe + dt >= 0.43f && l->corpo.apoio > PASSO_APOIO_MINIMO)
         corpo_impulso(&l->corpo, Vector3Scale(corpo_frente(&l->corpo), 0.60f * g->avanco));
+    /* Cada mao do Harite pode acertar uma vez. */
+    if (g == golpe_dados(GOLPE_FORCAR_FORA) && l->tempo_golpe < 0.30f &&
+        l->tempo_golpe + dt >= 0.30f)
+        l->golpe_acertou = false;
     l->tempo_golpe += dt;
     animar_golpe(l);
 
