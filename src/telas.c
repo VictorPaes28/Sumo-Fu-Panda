@@ -40,22 +40,33 @@ static void desenhar_opcoes(const char *const *opcoes, int qtd, int escolhida, i
 
 /* ------------------------------------------------------------------ Menu */
 
-static const char *const OPCOES_MENU[] = { "Jogar", "Sair" };
-#define QTD_OPCOES_MENU 2
+enum { OPCAO_JOGAR, OPCAO_CONFIGURACOES, OPCAO_SAIR, QTD_OPCOES_MENU };
+static const char *const OPCOES_MENU[] = { "Jogar", "Configurações", "Sair" };
 
 void menu_iniciar(TelaMenu *t)
 {
     t->opcao = 0;
 }
 
-AcaoMenu menu_atualizar(TelaMenu *t, const Intencao in[2])
+AcaoMenu menu_atualizar_com_configuracoes(TelaMenu *t, const Intencao in[2], bool *abrir)
 {
     for (int i = 0; i < 2; i++) {
         t->opcao = girar_indice(t->opcao, in[i].direcional_y, QTD_OPCOES_MENU);
-        if (in[i].a)
-            return (t->opcao == 0) ? MENU_JOGAR : MENU_SAIR;
+        if (in[i].a) {
+            if (t->opcao == OPCAO_CONFIGURACOES) {
+                *abrir = true;
+                return MENU_NENHUMA;
+            }
+            return t->opcao == OPCAO_JOGAR ? MENU_JOGAR : MENU_SAIR;
+        }
     }
     return MENU_NENHUMA;
+}
+
+AcaoMenu menu_atualizar(TelaMenu *t, const Intencao in[2])
+{
+    bool abrir = false;
+    return menu_atualizar_com_configuracoes(t, in, &abrir);
 }
 
 /* Medidas e cores da tela inicial. */
@@ -65,7 +76,7 @@ static const float MENU_LUTADOR_Y     = 196.0f;
 static const float MENU_LUTADOR_BORDA = 40.0f;   /* da borda da tela */
 static const float MENU_BOTAO_L       = 300.0f;
 static const float MENU_BOTAO_A       = 58.0f;
-static const float MENU_BOTAO_Y       = 400.0f;
+static const float MENU_BOTAO_Y       = 370.0f;
 static const float MENU_BOTAO_PASSO   = 74.0f;
 static const Color MENU_CEU_CIMA      = { 26, 18, 34, 255 };
 static const Color MENU_CEU_BAIXO     = { 86, 44, 36, 255 };
@@ -182,6 +193,19 @@ void menu_desenhar(const TelaMenu *t, Font titulo)
                     CENTRO_X, JANELA_ALTURA - 36, 18, (Color){ 70, 44, 30, 255 });
 }
 
+void configuracoes_desenhar(int opcao, bool tela_cheia)
+{
+    desenhar_fundo_menu();
+    ui_painel((Rectangle){ CENTRO_X - 300.0f, 130.0f, 600.0f, 430.0f },
+              UI_PAINEL, UI_DESTAQUE);
+    ui_texto_centro("Configurações", CENTRO_X, 177, 44, UI_TEXTO);
+    desenhar_botao(tela_cheia ? "Tela cheia: Sim" : "Tela cheia: Não", 277.0f, opcao == 0);
+    desenhar_botao("Voltar", 351.0f, opcao == 1);
+    ui_texto_centro("Controle: A altera, B volta   |   Teclado: C altera, X volta",
+                    CENTRO_X, 483, 18, UI_TEXTO_FRACO);
+    ui_texto_centro("F11 alterna a tela cheia", CENTRO_X, 514, 18, UI_TEXTO_FRACO);
+}
+
 /* ------------------------------------------------------------- Seleção */
 
 /* Medidas da tela de seleção (pixels e tamanhos de fonte). */
@@ -215,7 +239,8 @@ static const FrasePersonagem FRASES[] = {
     { "Po",        "Pesado e macio: empurra com a barriga." },
     { "Tai Lung",  "Leve e rápido, empurra forte." },
     { "Oogway",    "Lento, mas difícil de tirar do lugar." },
-    { "Minotauro", "O mais pesado e firme: avança como um muro." },
+    { "Kai",       "O mais pesado e firme: avança como um muro." },
+    { "Macaco",    "Leve, rápido e de braços longos." },
 };
 
 void selecao_iniciar(TelaSelecao *t)

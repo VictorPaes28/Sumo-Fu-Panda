@@ -1,0 +1,3 @@
+arena_musica.wav: composição instrumental original sintetizada para este projeto.
+arena_torcida.wav: aplausos sintetizados, sem gravações ou vozes de terceiros.
+Criados localmente em 16/11/2026. Uso e modificação permitidos no projeto.

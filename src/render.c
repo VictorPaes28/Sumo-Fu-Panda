@@ -5,6 +5,7 @@
  * Dono: Principal.
  */
 #include <math.h>
+#include <stdlib.h>
 #include "render.h"
 #include "config.h"
 #include "raymath.h"
@@ -322,7 +323,7 @@ static void desenhar_plateia(const Partida *p, const Camera3D *cam)
 
     /* A torcida vibra logo depois que alguém perde um round (ou a partida). */
     float animo = 0.0f;
-    if (p->estado == PARTIDA_FIM_ROUND || p->estado == PARTIDA_FIM)
+    if (p && (p->estado == PARTIDA_FIM_ROUND || p->estado == PARTIDA_FIM))
         animo = fmaxf(0.0f, 1.0f - p->tempo_no_estado / TORCIDA_DURACAO);
 
     rlBegin(RL_QUADS);
@@ -363,13 +364,116 @@ static void desenhar_plateia(const Partida *p, const Camera3D *cam)
     rlEnd();
 }
 
-static void desenhar_ringue(const Partida *p, const Camera3D *cam)
+/* Cenários são apenas visuais. Todos usam o mesmo chão e RINGUE_RAIO,
+ * preservando os contratos da física e o trabalho nos golpes. */
+static void desenhar_lanterna(Vector3 base)
 {
-    DrawPlane((Vector3){ 0.0f, -PLATAFORMA_ALTURA - 0.002f, 0.0f }, (Vector2){ 50.0f, 50.0f },
+    Color madeira = {91, 43, 33, 255};
+    DrawCylinder(base, 0.07f, 0.10f, 2.4f, 8, madeira);
+    DrawCube((Vector3){base.x, base.y+2.4f, base.z}, 0.85f, 0.10f, 0.16f, madeira);
+    DrawSphereEx((Vector3){base.x+0.28f, base.y+2.05f, base.z}, 0.23f, 8, 12, (Color){220, 91, 43, 255});
+    DrawCylinder((Vector3){base.x+0.28f, base.y+1.78f, base.z}, 0.06f, 0.06f, 0.12f, 6, GOLD);
+}
+
+static void desenhar_telhado(float x, float y, float z, float largura, float fundo)
+{
+    Color telha = {38, 87, 78, 255};
+    Vector3 a = {x-largura, y, z-fundo}, b = {x+largura, y, z-fundo};
+    Vector3 c = {x+largura, y, z+fundo}, d = {x-largura, y, z+fundo};
+    Vector3 e = {x-largura*0.8f, y+0.8f, z}, f = {x+largura*0.8f, y+0.8f, z};
+    desenhar_face(a,b,f,e,(Vector3){0,1,-1},tom_da_face((Vector3){0,1,-1},telha));
+    desenhar_face(e,f,c,d,(Vector3){0,1,1},telha);
+    DrawCylinderEx(a,b,0.07f,0.07f,8,(Color){205,177,103,255});
+    DrawCylinderEx(c,d,0.07f,0.07f,8,(Color){205,177,103,255});
+    DrawCylinderEx(e,f,0.08f,0.08f,8,(Color){205,177,103,255});
+}
+
+static void desenhar_patio_jade(void)
+{
+    Color pedra = {100, 124, 122, 255};
+    DrawPlane((Vector3){0,-PLATAFORMA_ALTURA-0.002f,0},(Vector2){70,70},(Color){57,85,87,255});
+    /* Lajes separadas por juntas, com variação determinística de tom. */
+    for (int x = -7; x <= 7; x++) for (int z = -7; z <= 5; z++) {
+        if (abs(x) < 3 && abs(z) < 3) continue;
+        DrawCube((Vector3){x*1.7f,-0.19f,z*1.7f},1.66f,0.035f,1.66f,
+                 escurecer(pedra,0.85f+0.05f*((x*x+z*z)%4)));
+    }
+    float atras = -PLATAFORMA_BASE-2.4f;
+    for (int k = 0; k < 3; k++)
+        DrawCube((Vector3){0,-0.12f+k*0.15f,atras+0.6f-k*0.35f},7.8f,0.15f,1.8f-k*0.4f,(Color){144,159,148,255});
+    for (int lado = -1; lado <= 1; lado += 2) {
+        DrawCube((Vector3){lado*3.1f,1.75f,atras},0.30f,3.8f,0.30f,(Color){130,51,39,255});
+        DrawCube((Vector3){lado*3.1f,0.25f,atras},0.64f,0.6f,0.64f,pedra);
+        for (int k = 0; k < 4; k++) {
+            float x = lado*(PLATAFORMA_BASE+0.9f), z = -4.4f+k*2.6f;
+            DrawCube((Vector3){x,0.35f,z},0.3f,1.1f,0.3f,pedra);
+            if (k < 3) DrawCube((Vector3){x,0.65f,z+1.3f},0.16f,0.14f,2.6f,pedra);
+        }
+        desenhar_lanterna((Vector3){lado*(PLATAFORMA_BASE+0.65f),-0.2f,-2.8f});
+    }
+    DrawCube((Vector3){0,3.2f,atras},6.5f,0.3f,0.35f,(Color){130,51,39,255});
+    DrawCube((Vector3){0,2.85f,atras+0.1f},1.7f,0.62f,0.16f,(Color){38,73,64,255});
+    DrawCubeWires((Vector3){0,2.85f,atras+0.1f},1.7f,0.62f,0.16f,GOLD);
+    desenhar_telhado(0,3.55f,atras,4.2f,1.5f);
+    /* Silhuetas de montanhas ao fundo, fora de qualquer área de combate. */
+    for (int k = 0; k < 9; k++)
+        DrawCylinder((Vector3){(k-4)*5.0f,-0.2f,-19.0f-(k%2)*3},0,4.0f,5.0f+(k%3)*2,5,(Color){49,76,80,255});
+}
+
+static void desenhar_folhagem(Vector3 centro, float escala, Color cor)
+{
+    rlPushMatrix();
+    rlTranslatef(centro.x,centro.y,centro.z);
+    rlScalef(escala,escala*0.24f,escala*0.6f);
+    DrawSphereEx((Vector3){0},1,4,7,cor);
+    rlPopMatrix();
+}
+
+static void desenhar_bosque(void)
+{
+    DrawPlane((Vector3){0,-PLATAFORMA_ALTURA-0.002f,0},(Vector2){70,70},(Color){39,62,43,255});
+    /* Bambu em ilhas: o corredor à frente fica livre para a câmera. */
+    for (int ilha = 0; ilha < 18; ilha++) {
+        float a = PI + (ilha-8.5f)*0.15f;
+        float distancia = PLATAFORMA_BASE+2.0f+(ilha%3)*1.4f;
+        float x = sinf(a)*distancia, z = cosf(a)*distancia;
+        for (int haste = 0; haste < 3; haste++) {
+            Vector3 b = {x+(haste-1)*0.42f,-0.2f,z+(haste%2)*0.4f};
+            float altura = 3.8f+((ilha*7+haste*3)%5)*0.6f;
+            Color cor = ilha%2 ? (Color){75,115,62,255} : (Color){96,139,69,255};
+            DrawCylinder(b,0.07f,0.11f,altura,7,cor);
+            for (float y = 0.5f; y < altura; y += 0.65f)
+                DrawCylinder((Vector3){b.x,y,b.z},0.115f,0.115f,0.045f,7,(Color){136,160,82,255});
+            desenhar_folhagem((Vector3){b.x+0.4f,altura-0.5f,b.z},1.05f,(Color){47,93,54,255});
+            desenhar_folhagem((Vector3){b.x-0.4f,altura-1.2f,b.z},0.85f,(Color){68,112,57,255});
+        }
+        rlPushMatrix();
+        rlTranslatef(x,-0.12f,z+0.6f);
+        rlScalef(0.7f,0.45f,0.6f);
+        DrawSphereEx((Vector3){0},1,4,6,(Color){92,108,91,255});
+        rlPopMatrix();
+    }
+    for (int lado = -1; lado <= 1; lado += 2)
+        desenhar_lanterna((Vector3){lado*(PLATAFORMA_BASE+0.65f),-0.2f,-1.8f});
+    for (int k = 0; k < 9; k++) {
+        float z = 4.5f+k*0.75f;
+        DrawCube((Vector3){0,-0.18f,z},1.2f,0.035f,0.6f,(Color){113,120,94,255});
+    }
+}
+
+static void desenhar_ringue(const Partida *p, const Camera3D *cam, int arena)
+{
+    if (arena == 1) desenhar_patio_jade();
+    else if (arena == 2) desenhar_bosque();
+    else {
+        DrawPlane((Vector3){ 0.0f, -PLATAFORMA_ALTURA - 0.002f, 0.0f }, (Vector2){ 50.0f, 50.0f },
               COR_CHAO);
-    desenhar_plateia(p, cam);
+        desenhar_plateia(p, cam);
+    }
     desenhar_plataforma();
-    desenhar_disco_gradiente(PLATAFORMA_TOPO, -0.004f, COR_ARGILA_LUZ, COR_ARGILA);
+    Color centro = arena == 1 ? (Color){177,191,172,255} : COR_ARGILA_LUZ;
+    Color borda = arena == 1 ? (Color){123,150,134,255} : COR_ARGILA;
+    desenhar_disco_gradiente(PLATAFORMA_TOPO, -0.004f, centro, borda);
 
     /* Areia lisa logo fora do círculo: é onde ficaria a marca do pé de quem saiu. */
     desenhar_anel(RINGUE_RAIO + FARDO_RAIO, RINGUE_RAIO + FARDO_RAIO + AREIA_LARGURA,
@@ -443,11 +547,12 @@ static void desenhar_corpo(const Corpo *c, int indice_personagem, int jogador, R
             desenhar_caixa(pecas[i], p->tamanho[i], (Vector3){ 0 }, GREEN, true);
 }
 
-void render_cena(const Partida *p, Recursos *r, const CameraLuta *c, bool depuracao)
+/* Extensão privada do executável: o contrato de render_cena das demos continua. */
+void render_cena_arena(const Partida *p, Recursos *r, const CameraLuta *c, bool depuracao, int arena)
 {
     luz_atualizar(r->luz, c->camera.position);
     BeginMode3D(c->camera);
-    desenhar_ringue(p, &c->camera);
+    desenhar_ringue(p, &c->camera, arena);
     if (p->round_ativo) {
         for (int i = 0; i < 2; i++)
             desenhar_corpo(&p->lutadores[i].corpo, p->jogadores[i].personagem,
@@ -461,6 +566,24 @@ void render_cena(const Partida *p, Recursos *r, const CameraLuta *c, bool depura
         DrawText(TextFormat("contatos no passo: %d  relogio: %.1f s", p->fisica.qtd_contatos,
                             p->relogio), 10, JANELA_ALTURA - 60, 20, GREEN);
     }
+}
+
+void render_cena(const Partida *p, Recursos *r, const CameraLuta *c, bool depuracao)
+{
+    render_cena_arena(p,r,c,depuracao,0);
+}
+
+void render_arena_previa(RenderTexture2D alvo, int arena)
+{
+    Camera3D cam = { .position = {9,9,13}, .target = {0,0.5f,-1.0f},
+                     .up = {0,1,0}, .fovy = 42, .projection = CAMERA_PERSPECTIVE };
+    /* Sem partida: plateia neutra, nenhuma física criada na seleção. */
+    BeginTextureMode(alvo);
+    ClearBackground(arena == 2 ? (Color){30,48,39,255} : (Color){58,81,87,255});
+    BeginMode3D(cam);
+    desenhar_ringue(NULL,&cam,arena);
+    EndMode3D();
+    EndTextureMode();
 }
 
 void render_previa(const Corpo *c, int personagem, int jogador, Recursos *r,

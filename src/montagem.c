@@ -4,10 +4,12 @@
  *
  * Dono: Integrante B.
  */
+#include <math.h>
 #include <stdio.h>
 #include "montagem.h"
 #include "config.h"
 #include "ui.h"
+#include "raymath.h"
 
 void montagem_iniciar(TelaMontagem *t)
 {
@@ -88,16 +90,15 @@ static const float MON_LINHA_ALTURA      = 34.0f;
 static const float MON_LINHA_MARGEM      = 16.0f;   /* da borda do painel até a linha */
 static const float MON_SETA_LARGURA      = 16.0f;   /* setas de "tem mais golpes" */
 static const float MON_SETA_ALTURA       = 10.0f;
-static const float MON_DESCRICAO_ALTURA  = 76.0f;   /* caixa fixa: cabem 3 linhas */
-static const float MON_ESPACO            = 10.0f;   /* entre os blocos da tela */
+static const float MON_CATALOGO_LARGURA  = 220.0f;
+static const float MON_COLUNAS_ESPACO    = 14.0f;
+static const float MON_PREVIA_ALTURA     = 327.0f;
 static const float MON_ESPACO_COMBO      = 70.0f;   /* altura dos espaços do combo */
 static const int   MON_FONTE_NOME        = 20;
 static const int   MON_FONTE_FICHA       = 16;
-static const int   MON_FONTE_SELO        = 12;
 static const int   MON_FONTE_DESCRICAO   = 20;
 static const int   MON_FONTE_ESPACO      = 18;      /* nome do golpe num espaço do combo */
 static const int   MON_FONTE_MINIMA      = 12;
-static const Color MON_COR_FORTE         = { 214, 84, 64, 255 };   /* selo "FORTE" */
 static const Color MON_COR_AGARRA        = { 64, 170, 140, 255 };  /* selo "FAIXA" */
 
 /* Maior fonte (até "maximo") em que o texto cabe na largura: texto comprido
@@ -139,38 +140,14 @@ static void desenhar_seta(float cx, float y, bool para_cima, Color cor)
                      (Vector2){ cx + meia, y }, cor);
 }
 
-/* Selo pequeno ("FORTE", "FAIXA") com o centro vertical em cy. Devolve a
- * largura, para o próximo selo vir ao lado. */
-static float desenhar_selo(const char *texto, float x, float cy, Color cor)
-{
-    float w = (float)MeasureText(texto, MON_FONTE_SELO) + 10.0f;
-    float h = (float)MON_FONTE_SELO + 4.0f;
-    DrawRectangleRounded((Rectangle){ x, cy - h / 2.0f, w, h }, 0.5f, 6, cor);
-    DrawText(texto, (int)x + 5, (int)(cy - MON_FONTE_SELO / 2.0f), MON_FONTE_SELO, UI_FUNDO);
-    return w;
-}
-
-/* Uma linha da lista: nome, selos e a ficha curta (dano e stamina) à direita. */
+/* A ficha completa fica ao lado da lista. */
 static void desenhar_linha_golpe(Rectangle r, const Golpe *d, bool selecionado, Color cor)
 {
-    if (selecionado)
-        DrawRectangleRec(r, Fade(cor, 0.25f));
-
-    float cy = r.y + r.height / 2.0f;
-    int x = (int)r.x + 12;
-    DrawText(d->nome, x, (int)(cy - MON_FONTE_NOME / 2.0f), MON_FONTE_NOME,
+    ui_painel(r, selecionado ? Fade(cor, 0.25f) : Fade(BLACK, 0.20f),
+              selecionado ? cor : UI_BORDA);
+    int fonte = fonte_que_cabe(d->nome, MON_FONTE_NOME, r.width - 20.0f);
+    DrawText(d->nome, (int)r.x + 10, (int)(r.y + (r.height - fonte) / 2), fonte,
              selecionado ? UI_TEXTO : UI_TEXTO_FRACO);
-
-    float x_selo = (float)(x + MeasureText(d->nome, MON_FONTE_NOME) + 10);
-    if (d->forte)
-        x_selo += desenhar_selo("FORTE", x_selo, cy, MON_COR_FORTE) + 6.0f;
-    if (d->agarra)
-        desenhar_selo("FAIXA", x_selo, cy, MON_COR_AGARRA);
-
-    const char *ficha = TextFormat("dano %.0f%%  stamina %.0f", d->dano, d->custo_stamina);
-    DrawText(ficha, (int)(r.x + r.width) - 12 - MeasureText(ficha, MON_FONTE_FICHA),
-             (int)(cy - MON_FONTE_FICHA / 2.0f), MON_FONTE_FICHA,
-             selecionado ? UI_DESTAQUE : UI_TEXTO_FRACO);
 }
 
 /* Lista com rolagem: só os golpes que cabem, com setas quando há mais
@@ -182,8 +159,8 @@ static void desenhar_catalogo(float x, float w, int cursor, Color cor)
 
     for (int k = 0; k < visiveis; k++) {
         int g = primeiro + k;
-        Rectangle linha = { x + MON_LINHA_MARGEM, MON_LISTA_Y + k * MON_LINHA_ALTURA,
-                            w - 2.0f * MON_LINHA_MARGEM, MON_LINHA_ALTURA };
+        Rectangle linha = { x, MON_LISTA_Y + k * MON_LINHA_ALTURA,
+                            w, MON_LINHA_ALTURA - 4.0f };
         desenhar_linha_golpe(linha, golpe_dados((TipoGolpe)g), g == cursor, cor);
     }
 
@@ -238,18 +215,56 @@ static int quebrar_texto(const char *texto, float largura, int tamanho, bool des
     return linhas;
 }
 
-/* Descrição do golpe numa caixa de tamanho fixo. Se ela for longa demais
- * para a fonte normal, a fonte diminui até caber inteira. */
-static void desenhar_descricao(Rectangle caixa, const char *descricao)
+static void desenhar_previa(Rectangle caixa, const Golpe *g, float tempo, Texture2D imagem, Color cor)
 {
+    float fim_ativo = g->tempo_preparo + g->tempo_ativo;
+    bool ativo = tempo >= g->tempo_preparo && tempo < fim_ativo;
+    const char *fase = tempo < g->tempo_preparo ? "Preparo"
+                     : ativo ? "Ataque" : tempo < g->duracao ? "Volta" : "Guarda";
+
     ui_painel(caixa, Fade(BLACK, 0.30f), UI_BORDA);
-    float largura = caixa.width - 20.0f;
-    float altura = caixa.height - 12.0f;
-    int tamanho = MON_FONTE_DESCRICAO;
-    while (tamanho > MON_FONTE_MINIMA &&
-           quebrar_texto(descricao, largura, tamanho, false, 0, 0, UI_TEXTO) * (tamanho + 4) > altura)
-        tamanho--;
-    quebrar_texto(descricao, largura, tamanho, true, (int)caixa.x + 10, (int)caixa.y + 8, UI_TEXTO);
+    int x = (int)caixa.x + 12;
+    int y = (int)caixa.y;
+    float largura = caixa.width - 24.0f;
+    DrawText(g->nome, x, y + 12, fonte_que_cabe(g->nome, 25, largura), UI_TEXTO);
+    if (imagem.id != 0)
+        DrawText(fase, x, y + 45, MON_FONTE_FICHA, ativo ? UI_DESTAQUE : cor);
+
+    Rectangle area = { (float)x, caixa.y + 66.0f, largura, 139.0f };
+    DrawRectangleRounded(area, 0.12f, 6, Fade(cor, 0.11f));
+    if (imagem.id != 0) {
+        float escala = fminf(largura / imagem.width, area.height / imagem.height);
+        float w = imagem.width * escala, h = imagem.height * escala;
+        Rectangle origem = { 0, 0, (float)imagem.width, -(float)imagem.height };
+        Rectangle destino = { area.x + (area.width - w) / 2, area.y + (area.height - h) / 2, w, h };
+        DrawTexturePro(imagem, origem, destino, (Vector2){0}, 0.0f, WHITE);
+    }
+
+    Rectangle barra = { (float)x, caixa.y + 212.0f, largura, 6.0f };
+    DrawRectangleRec(barra, UI_BORDA);
+    float inicio = barra.width * g->tempo_preparo / g->duracao;
+    float janela = barra.width * g->tempo_ativo / g->duracao;
+    DrawRectangleRec((Rectangle){ barra.x + inicio, barra.y, janela, barra.height },
+                     Fade(UI_DESTAQUE, 0.65f));
+    DrawRectangle((int)(barra.x + Clamp(tempo / g->duracao, 0.0f, 1.0f) * (barra.width - 2)),
+                  (int)barra.y - 2, 2, 10, UI_TEXTO);
+
+    DrawText(TextFormat("Dano %.0f%%       Stamina %.0f", g->dano, g->custo_stamina),
+             x, y + 229, 18, UI_TEXTO);
+    const char *tipo = g->forte && g->agarra ? "Forte · Pegada na faixa"
+                     : g->forte ? "Golpe forte" : g->agarra ? "Pegada na faixa" : "";
+    const char *efeito = g->impulso_vertical >= 80.0f ? "Ergue o alvo"
+                       : g->impulso_vertical <= -80.0f ? "Força para baixo"
+                       : fabsf(g->impulso_lateral) >= fabsf(g->impulso) && g->impulso_lateral != 0.0f ? "Empurra de lado"
+                       : g->impulso < 0.0f ? "Puxa o alvo" : "Empurra o alvo";
+    const char *rotulo = tipo[0] ? TextFormat("%s  |  %s", efeito, tipo) : efeito;
+    DrawText(rotulo, x, y + 253, fonte_que_cabe(rotulo, MON_FONTE_FICHA, largura),
+             g->agarra ? MON_COR_AGARRA : UI_DESTAQUE);
+    int fonte = MON_FONTE_DESCRICAO;
+    while (fonte > MON_FONTE_MINIMA &&
+           quebrar_texto(g->descricao, largura, fonte, false, 0, 0, UI_TEXTO) * (fonte + 4) > 48)
+        fonte--;
+    quebrar_texto(g->descricao, largura, fonte, true, x, y + 273, UI_TEXTO_FRACO);
 }
 
 /* Os COMBO_MAX espaços do combo, a partir de y. */
@@ -302,9 +317,8 @@ static void desenhar_rodape(const TelaMontagem *t, int i, const Combo *combo, in
     }
 }
 
-/* Um lado da tela, de cima para baixo: lista, descrição, combo e rodapé.
- * Cada bloco começa onde o anterior termina, então nada se sobrepõe. */
-static void desenhar_lado(const TelaMontagem *t, int i, const Combo *combo)
+/* Catálogo e prévia lado a lado, com o combo e os controles abaixo. */
+static void desenhar_lado(const TelaMontagem *t, int i, const Combo *combo, float tempo, Texture2D imagem)
 {
     float x = (i == 0) ? 40.0f : (float)JANELA_LARGURA / 2 + 20.0f;
     float w = (float)JANELA_LARGURA / 2 - 60.0f;
@@ -315,14 +329,13 @@ static void desenhar_lado(const TelaMontagem *t, int i, const Combo *combo)
               t->pronto[i] ? cor : UI_BORDA);
     ui_texto_centro(TextFormat("Jogador %d", i + 1), cx, (int)MON_PAINEL_Y + 10, 28, cor);
 
-    desenhar_catalogo(x, w, t->cursor_catalogo[i], cor);
-
-    /* A caixa fica abaixo do espaço da lista CHEIA (e da seta de baixo),
-     * mesmo com menos golpes: assim ela não pula de lugar. */
-    float y = MON_LISTA_Y + MONTAGEM_GOLPES_VISIVEIS * MON_LINHA_ALTURA + MON_SETA_ALTURA + MON_ESPACO;
-    Rectangle caixa = { x + MON_LINHA_MARGEM, y, w - 2.0f * MON_LINHA_MARGEM, MON_DESCRICAO_ALTURA };
-    desenhar_descricao(caixa, golpe_dados((TipoGolpe)t->cursor_catalogo[i])->descricao);
-    y += MON_DESCRICAO_ALTURA + MON_ESPACO;
+    float inicio = x + MON_LINHA_MARGEM;
+    desenhar_catalogo(inicio, MON_CATALOGO_LARGURA, t->cursor_catalogo[i], cor);
+    float previa_x = inicio + MON_CATALOGO_LARGURA + MON_COLUNAS_ESPACO;
+    Rectangle previa = { previa_x, MON_LISTA_Y, x + w - MON_LINHA_MARGEM - previa_x,
+                          MON_PREVIA_ALTURA };
+    desenhar_previa(previa, golpe_dados((TipoGolpe)t->cursor_catalogo[i]), tempo, imagem, cor);
+    float y = previa.y + previa.height + 14.0f;
 
     desenhar_espacos_combo(t, i, combo, x, w, y);
     y += MON_ESPACO_COMBO + 32.0f;   /* espaços + a linha "(depois do 4º...)" */
@@ -330,10 +343,20 @@ static void desenhar_lado(const TelaMontagem *t, int i, const Combo *combo)
     desenhar_rodape(t, i, combo, cx, (int)y, w - 2.0f * MON_LINHA_MARGEM);
 }
 
-void montagem_desenhar(const TelaMontagem *t, const Combo *combo_j1, const Combo *combo_j2)
+/* Entrada usada pelo jogo com as texturas renderizadas pelo main. */
+void montagem_desenhar_com_previas(const TelaMontagem *t, const Combo *combo_j1,
+                                  const Combo *combo_j2, const float tempo[2],
+                                  const Texture2D imagem[2])
 {
     ClearBackground(UI_FUNDO);
     ui_texto_centro("Montem seus combos", JANELA_LARGURA / 2, 40, 44, UI_TEXTO);
-    desenhar_lado(t, 0, combo_j1);
-    desenhar_lado(t, 1, combo_j2);
+    desenhar_lado(t, 0, combo_j1, tempo[0], imagem[0]);
+    desenhar_lado(t, 1, combo_j2, tempo[1], imagem[1]);
+}
+
+void montagem_desenhar(const TelaMontagem *t, const Combo *combo_j1, const Combo *combo_j2)
+{
+    const float tempo[2] = {0};
+    const Texture2D imagem[2] = {0};
+    montagem_desenhar_com_previas(t, combo_j1, combo_j2, tempo, imagem);
 }

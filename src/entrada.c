@@ -84,3 +84,12 @@ Intencao entrada_ler(int jogador)
         return ler_controle(jogador);
     return ler_teclado(jogador);
 }
+
+/* Integração privada: a escolha feita na entrada da partida não muda quando
+ * outro controle conecta. O contrato público das demos continua igual. */
+Intencao entrada_ler_dispositivo(int jogador, int controle)
+{
+    if (jogador < 0 || jogador > 1) return entrada_vazia();
+    if (controle >= 0 && IsGamepadAvailable(controle)) return ler_controle(controle);
+    return ler_teclado(jogador);
+}
