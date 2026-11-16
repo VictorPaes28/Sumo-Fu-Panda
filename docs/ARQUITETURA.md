@@ -103,7 +103,7 @@ para o lugar errado. Passe sempre ponteiros.
 | `Partida` (física, placar, relógio) | `partida_iniciar` | `partida_liberar` | `main.c` |
 | `Lutador` (corpo, stamina, hematomas) | início de cada round | fim de cada round | `Partida` |
 | Nós do combo (`malloc`) | `combo_inserir` | `combo_remover` / `combo_liberar` | `Jogador.combo` |
-| Nós dos hematomas (`malloc`) | `hematoma_inserir` | `hematomas_curar` / `hematomas_liberar` | `Lutador.hematomas` |
+| Nós dos hematomas (`malloc`) | `hematomas_inserir` | `hematomas_curar` / `hematomas_liberar` | `Lutador.hematomas` |
 | Objetos do ODE | `fisica_iniciar`, `corpo_criar` | `corpo_destruir`, `fisica_liberar` | `Partida`, `Corpo` |
 | Modelos e sons | `recursos_carregar` | `recursos_liberar` | `main.c` |
 
@@ -132,7 +132,7 @@ Telas não trocam de tela nem tocam sons: devolvem uma ação, e o `main.c` deci
                  lutador_passo_fisica(l)   x2   -> equilíbrio pelo dano, corpo_passo
                                                   (forças reaplicadas EM CADA passo)
                  fisica_passo(&fisica)          -> colisões, contatos, dWorldQuickStep
-                 combate_processar(...)         -> contatos -> hematoma_inserir (insertion sort)
+                 combate_processar(...)         -> contatos -> hematomas_inserir (insertion sort)
                                                    + impulso
                  relogio += FISICA_DT
                  acumulador -= FISICA_DT
