@@ -95,14 +95,20 @@ Gerados no rFXGen (ou outra fonte livre), em `.wav`, em `assets/sons/`:
 | `golpe_forte.wav` | acerto de golpe forte | gerado no rFXGen |
 | `queda.wav` | alguém caiu ou saiu do ringue | gerado no rFXGen |
 | `contagem.wav` | cada número do 3, 2, 1 | gerado no rFXGen |
-| `lute.wav` | início da luta | gerado no rFXGen |
+| `lute.wav` | início da luta, após a contagem | gongo de síntese original |
 | `vitoria.wav` | fim da partida | gerado no rFXGen |
 | `menu_mover.wav` | mover o cursor nos menus | gerado no rFXGen |
 | `menu_confirmar.wav` | confirmar nos menus | gerado no rFXGen |
 
-Origem: os 8 sons foram gerados pelo grupo no **rFXGen** (versão no navegador,
+Origem: os 7 efeitos do rFXGen foram gerados pelo grupo no **rFXGen** (versão no navegador,
 https://raylibtech.itch.io/rfxgen) em 2026-11-14, a partir dos presets e com os parâmetros
 ajustados à mão. Nenhum som veio da internet. Formato: WAV, 44100 Hz, 16 bits, mono;
 até 1 s cada (a `vitoria`, até 2 s); a pasta inteira tem cerca de 230 KB.
+
+A vinheta `assets/sons/menu_abertura.wav` e a trilha `assets/musica/menus.wav`
+também são de síntese original. A vinheta toca ao abrir o menu inicial. A trilha
+toca em loop na seleção de personagens e na montagem do combo e retoma do
+ponto da pausa. A trilha da arena toca durante a luta. O volume de música
+ajusta as duas trilhas e o de efeitos ajusta a vinheta e o gongo.
 
 Arquivo faltando não quebra o jogo: ele só fica sem aquele som ou modelo (desenha caixas).

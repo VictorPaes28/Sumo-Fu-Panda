@@ -97,8 +97,9 @@ typedef struct {
     float tempo_golpe_previa[2]; /* tempo do golpe destacado (s) */
     float tempo_menu;            /* desde que o menu abriu: troca os lutadores (s) */
     Font fonte_ui;
-    Music musica;
-    Sound torcida;
+    Music musica, musica_menus;
+    Sound torcida, abertura;
+    bool tem_musica_menus, musica_menus_iniciada, tem_abertura;
     bool tem_musica, tem_torcida;
     int volume_musica, volume_efeitos;
     int dispositivo[2];          /* -2 aguardando, -1 teclado, >= 0 controle */
@@ -115,9 +116,42 @@ typedef struct {
 static void apresentacao_volumes(Jogo *j)
 {
     if (j->tem_musica) SetMusicVolume(j->musica, j->volume_musica / 10.0f);
+    if (j->tem_musica_menus) SetMusicVolume(j->musica_menus, j->volume_musica / 10.0f);
+    if (j->tem_abertura) SetSoundVolume(j->abertura, j->volume_efeitos / 10.0f);
     if (j->tem_torcida) SetSoundVolume(j->torcida, j->volume_efeitos / 10.0f);
     for (int i = 0; i < SOM_QTD; i++)
         if (j->recursos.tem_som[i]) SetSoundVolume(j->recursos.sons[i], j->volume_efeitos / 10.0f);
+}
+
+static void atualizar_audio(Jogo *j, Tela tela_anterior)
+{
+    bool nos_menus = j->tela == TELA_SELECAO || j->tela == TELA_MONTAGEM;
+    /* Cada trilha fica restrita às suas telas. A dos menus retoma do ponto da pausa. */
+    if (j->tem_musica) {
+        if (j->tela == TELA_LUTA) {
+            if (tela_anterior != TELA_LUTA) PlayMusicStream(j->musica);
+            UpdateMusicStream(j->musica);
+        } else if (tela_anterior == TELA_LUTA) {
+            StopMusicStream(j->musica);
+        }
+    }
+    if (j->tem_musica_menus) {
+        if (nos_menus) {
+            if (!j->musica_menus_iniciada) {
+                PlayMusicStream(j->musica_menus);
+                j->musica_menus_iniciada = true;
+            } else if (tela_anterior != TELA_SELECAO && tela_anterior != TELA_MONTAGEM) {
+                ResumeMusicStream(j->musica_menus);
+            }
+            UpdateMusicStream(j->musica_menus);
+        } else if (tela_anterior == TELA_SELECAO || tela_anterior == TELA_MONTAGEM) {
+            PauseMusicStream(j->musica_menus);
+        }
+    }
+    if (j->tem_abertura && tela_anterior != j->tela) {
+        if (j->tela == TELA_MENU) PlaySound(j->abertura);
+        else if (tela_anterior == TELA_MENU) StopSound(j->abertura);
+    }
 }
 
 static void apresentacao_salvar_config(const Jogo *j)
@@ -548,7 +582,6 @@ static void atualizar(Jogo *j, float dt)
             in[i].direcional_x += teclado.direcional_x;
         }
     }
-    if (j->tem_musica) UpdateMusicStream(j->musica);
 
     if (IsKeyPressed(KEY_F11)) {
         ToggleFullscreen();
@@ -1210,12 +1243,23 @@ int main(void)
     if (IsAudioDeviceReady() && FileExists(caminho)) {
         j->musica = LoadMusicStream(caminho);
         j->tem_musica = IsMusicValid(j->musica);
-        if (j->tem_musica) { j->musica.looping = true; PlayMusicStream(j->musica); }
+        if (j->tem_musica) j->musica.looping = true;
     }
     caminho = TextFormat("%sassets/sons/arena_torcida.wav", GetApplicationDirectory());
     if (IsAudioDeviceReady() && FileExists(caminho)) {
         j->torcida = LoadSound(caminho);
         j->tem_torcida = IsSoundValid(j->torcida);
+    }
+    caminho = TextFormat("%sassets/musica/menus.wav", GetApplicationDirectory());
+    if (IsAudioDeviceReady() && FileExists(caminho)) {
+        j->musica_menus = LoadMusicStream(caminho);
+        j->tem_musica_menus = IsMusicValid(j->musica_menus);
+        if (j->tem_musica_menus) j->musica_menus.looping = true;
+    }
+    caminho = TextFormat("%sassets/sons/menu_abertura.wav", GetApplicationDirectory());
+    if (IsAudioDeviceReady() && FileExists(caminho)) {
+        j->abertura = LoadSound(caminho);
+        j->tem_abertura = IsSoundValid(j->abertura);
     }
     apresentacao_volumes(j);
     for (int i = 0; i < 2; i++) j->dispositivo[i] = -2;
@@ -1230,11 +1274,14 @@ int main(void)
     }
     menu_iniciar(&j->menu);
     j->tela = TELA_MENU;
+    if (j->tem_abertura) PlaySound(j->abertura);
 
     while (!WindowShouldClose() && !j->sair) {
         float dt = GetFrameTime();
         if (dt > 0.1f) dt = 0.1f;        /* quadro travado (ex.: arrastar a janela) não vira salto */
+        Tela tela_anterior = j->tela;
         atualizar(j, dt);
+        atualizar_audio(j, tela_anterior);
         atualizar_resolucao(j);
         desenhar(j);
     }
@@ -1250,6 +1297,8 @@ int main(void)
             UnloadRenderTexture(j->previa_golpe[i].imagem);
     recursos_liberar(&j->recursos);
     if (j->tem_musica) UnloadMusicStream(j->musica);
+    if (j->tem_musica_menus) UnloadMusicStream(j->musica_menus);
+    if (j->tem_abertura) UnloadSound(j->abertura);
     if (j->tem_torcida) UnloadSound(j->torcida);
     if (j->fonte_ui.texture.id != GetFontDefault().texture.id) UnloadFont(j->fonte_ui);
     if (j->quadro.id)
