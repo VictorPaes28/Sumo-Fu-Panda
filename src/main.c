@@ -48,6 +48,7 @@ typedef struct {
     CameraLuta camera;           /* câmera da luta (acompanha e treme) */
     Previa previa[2];            /* lutador ao vivo: no menu e na seleção */
     float tempo_menu;            /* desde que o menu abriu: troca os lutadores (s) */
+    bool musica_comecou;         /* a música dos menus já tocou alguma vez */
 } Jogo;
 
 static void tocar_sons_de_menu(const Jogo *j, const Intencao in[2])
@@ -69,6 +70,29 @@ static void tocar_sons_da_partida(const Jogo *j)
     if (e->contagem)          recursos_tocar(&j->recursos, SOM_CONTAGEM);
     if (e->lute)              recursos_tocar(&j->recursos, SOM_LUTE);
     if (e->fim_partida)       recursos_tocar(&j->recursos, SOM_VITORIA);
+}
+
+/* Música de fundo: toca na seleção e na montagem; pausa no resto (no menu
+ * inicial toca a abertura; na luta e no resultado, os sons da partida).
+ * Voltando à seleção ou à montagem, continua de onde parou. A raylib exige
+ * UpdateMusicStream a cada quadro para continuar lendo o arquivo. */
+static void atualizar_musica(Jogo *j)
+{
+    Recursos *r = &j->recursos;
+    if (!r->tem_musica_menus)
+        return;
+    bool tocar = j->tela == TELA_SELECAO || j->tela == TELA_MONTAGEM;
+    bool tocando = IsMusicStreamPlaying(r->musica_menus);
+    if (tocar && !tocando) {
+        if (j->musica_comecou)
+            ResumeMusicStream(r->musica_menus);
+        else
+            PlayMusicStream(r->musica_menus);
+        j->musica_comecou = true;
+    } else if (!tocar && tocando) {
+        PauseMusicStream(r->musica_menus);
+    }
+    UpdateMusicStream(r->musica_menus);
 }
 
 /* Volta (ou chega) ao menu inicial. O som de abertura toca toda vez que o
@@ -284,6 +308,7 @@ int main(void)
         float dt = GetFrameTime();
         if (dt > 0.1f) dt = 0.1f;        /* quadro travado (ex.: arrastar a janela) não vira salto */
         atualizar(j, dt);
+        atualizar_musica(j);
         desenhar(j);
     }
 

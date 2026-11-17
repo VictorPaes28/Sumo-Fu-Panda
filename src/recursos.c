@@ -49,6 +49,18 @@ void recursos_carregar(Recursos *r)
             faltando++;
     }
 
+    /* Música: LoadMusicStream lê o arquivo aos poucos enquanto toca, em vez de
+     * deixar os ~4 minutos descomprimidos na memória (LoadSound faria isso). */
+    const char *musica = TextFormat("%sassets/musica/menus.ogg", base);
+    if (FileExists(musica)) {
+        r->musica_menus = LoadMusicStream(musica);
+        r->tem_musica_menus = IsMusicValid(r->musica_menus);
+    }
+    if (r->tem_musica_menus)
+        SetMusicVolume(r->musica_menus, MUSICA_MENUS_VOLUME);
+    else
+        faltando++;
+
     /* Fonte do título, carregada grande para não borrar ao desenhar. */
     const char *fonte = TextFormat("%sassets/fontes/Bangers-Regular.ttf", base);
     /* Sem a lista, a raylib carrega só o ASCII: o "Ô" de SUMÔ virava "?".
@@ -82,5 +94,7 @@ void recursos_liberar(Recursos *r)
     for (int s = 0; s < SOM_QTD; s++)
         if (r->tem_som[s])
             UnloadSound(r->sons[s]);
+    if (r->tem_musica_menus)
+        UnloadMusicStream(r->musica_menus);
     *r = (Recursos){0};
 }

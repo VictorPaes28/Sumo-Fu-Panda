@@ -116,4 +116,19 @@ Se o jogo for publicado ou usado fora da disciplina, esses dois precisam ser tro
 áudios próprios ou livres (por exemplo, o gongo CC BY 4.0 de kevp888 no Freesound:
 https://freesound.org/people/kevp888/sounds/711170/, creditando o autor).
 
+## Música
+
+Em `assets/musica/`, em `.ogg` (lida aos poucos com `LoadMusicStream`, em loop):
+
+| Arquivo | Quando toca | Origem |
+|---|---|---|
+| `menus.ogg` | de fundo, baixa, na seleção de personagem e na montagem do combo | "Oogway Ascends", de Hans Zimmer e John Powell (trilha de *Kung Fu Panda*, DreamWorks) |
+
+Só o ponto alto da faixa: de 0:58 a 1:55 (57 s, OGG estéreo, ~0,9 MB), do pico até o
+clímax; 0,8 s de entrada e 3 s de saída suaves, para o loop não dar tranco. O volume é ajustado no jogo
+(`MUSICA_MENUS_VOLUME` em `config.h`). É uma obra protegida, **sem licença livre**, usada só
+porque o jogo é um trabalho acadêmico, sem fins lucrativos, apresentado apenas na disciplina
+(decisão do grupo). Se o jogo for publicado ou usado fora da disciplina, trocar por uma
+música própria ou livre.
+
 Arquivo faltando não quebra o jogo: ele só fica sem aquele som ou modelo (desenha caixas).

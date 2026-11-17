@@ -6,10 +6,12 @@
  *   assets/modelos/<pasta do personagem>/<Personagem.modelo>
  *       ex.: assets/modelos/tai_lung/tai_lung.glb  (um .glb com esqueleto; ver pele.h)
  *   assets/sons/<nome>.wav ou .ogg  (nomes na tabela de SomJogo, em recursos.c)
+ *   assets/musica/menus.ogg  (música de fundo da seleção e da montagem)
  *
  * Arquivo faltando NÃO é erro: o jogo precisa rodar antes da arte ficar
  * pronta. Faltou um modelo -> a pele fica vazia (o render desenha caixas).
  * Faltou um som -> tem_som = false (recursos_tocar não faz nada).
+ * Faltou a música -> tem_musica_menus = false (o main.c não toca nada).
  * Cada arquivo faltando gera um aviso com TraceLog(LOG_WARNING, ...).
  *
  * Dono: Integrante B.
@@ -40,11 +42,15 @@ typedef struct {
     Pele  peles[MAX_PERSONAGENS];    /* modelo de cada personagem (pode estar vazia) */
     Sound sons[SOM_QTD];
     bool  tem_som[SOM_QTD];
+    Music musica_menus;              /* lida aos poucos (stream), em loop; o main.c
+                                        toca, pausa e chama UpdateMusicStream */
+    bool  tem_musica_menus;
     Font  fonte_titulo;              /* assets/fontes/Bangers-Regular.ttf (licença
                                         OFL); faltando, fica a fonte padrão   */
 } Recursos;
 
-/* Carrega os modelos de todos os personagens do catálogo e todos os sons.
+/* Carrega os modelos de todos os personagens do catálogo, todos os sons e
+ * a música dos menus (já com o volume MUSICA_MENUS_VOLUME).
  * Chamar DEPOIS de InitWindow() e InitAudioDevice(). Nunca falha:
  * o que não existir fica marcado como ausente. */
 void recursos_carregar(Recursos *r);

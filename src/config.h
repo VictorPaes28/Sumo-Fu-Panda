@@ -290,4 +290,9 @@
 #define PREVIA_ASSENTAR           0.6f   /* física simulada ao trocar de personagem,
                                             antes de mostrar: o corpo já aparece de pé (s) */
 
+/* ---------------------------------------------------------------- Música */
+#define MUSICA_MENUS_VOLUME       0.25f  /* música de fundo da seleção e da montagem
+                                            (0 a 1; os efeitos tocam em 1): baixa para
+                                            não cobrir os sons dos botões */
+
 #endif /* CONFIG_H */
