@@ -125,12 +125,18 @@ static void apresentacao_volumes(Jogo *j)
 
 static void atualizar_audio(Jogo *j, Tela tela_anterior)
 {
-    bool nos_menus = j->tela == TELA_SELECAO || j->tela == TELA_MONTAGEM;
+    bool nos_menus = j->tela == TELA_SELECAO || j->tela == TELA_ARENA ||
+                    j->tela == TELA_MONTAGEM;
     /* Cada trilha fica restrita às suas telas. A dos menus retoma do ponto da pausa. */
     if (j->tem_musica) {
         if (j->tela == TELA_LUTA) {
             if (tela_anterior != TELA_LUTA) PlayMusicStream(j->musica);
-            UpdateMusicStream(j->musica);
+            if (j->partida.pausada) {
+                PauseMusicStream(j->musica);
+            } else {
+                if (!IsMusicStreamPlaying(j->musica)) ResumeMusicStream(j->musica);
+                UpdateMusicStream(j->musica);
+            }
         } else if (tela_anterior == TELA_LUTA) {
             StopMusicStream(j->musica);
         }
@@ -140,11 +146,11 @@ static void atualizar_audio(Jogo *j, Tela tela_anterior)
             if (!j->musica_menus_iniciada) {
                 PlayMusicStream(j->musica_menus);
                 j->musica_menus_iniciada = true;
-            } else if (tela_anterior != TELA_SELECAO && tela_anterior != TELA_MONTAGEM) {
+            } else if (!IsMusicStreamPlaying(j->musica_menus)) {
                 ResumeMusicStream(j->musica_menus);
             }
             UpdateMusicStream(j->musica_menus);
-        } else if (tela_anterior == TELA_SELECAO || tela_anterior == TELA_MONTAGEM) {
+        } else if (IsMusicStreamPlaying(j->musica_menus)) {
             PauseMusicStream(j->musica_menus);
         }
     }
@@ -1245,22 +1251,30 @@ int main(void)
         j->tem_musica = IsMusicValid(j->musica);
         if (j->tem_musica) j->musica.looping = true;
     }
+    if (IsAudioDeviceReady() && !j->tem_musica)
+        TraceLog(LOG_WARNING, "AUDIO: nao foi possivel carregar %s", caminho);
     caminho = TextFormat("%sassets/sons/arena_torcida.wav", GetApplicationDirectory());
     if (IsAudioDeviceReady() && FileExists(caminho)) {
         j->torcida = LoadSound(caminho);
         j->tem_torcida = IsSoundValid(j->torcida);
     }
+    if (IsAudioDeviceReady() && !j->tem_torcida)
+        TraceLog(LOG_WARNING, "AUDIO: nao foi possivel carregar %s", caminho);
     caminho = TextFormat("%sassets/musica/menus.wav", GetApplicationDirectory());
     if (IsAudioDeviceReady() && FileExists(caminho)) {
         j->musica_menus = LoadMusicStream(caminho);
         j->tem_musica_menus = IsMusicValid(j->musica_menus);
         if (j->tem_musica_menus) j->musica_menus.looping = true;
     }
+    if (IsAudioDeviceReady() && !j->tem_musica_menus)
+        TraceLog(LOG_WARNING, "AUDIO: nao foi possivel carregar %s", caminho);
     caminho = TextFormat("%sassets/sons/menu_abertura.wav", GetApplicationDirectory());
     if (IsAudioDeviceReady() && FileExists(caminho)) {
         j->abertura = LoadSound(caminho);
         j->tem_abertura = IsSoundValid(j->abertura);
     }
+    if (IsAudioDeviceReady() && !j->tem_abertura)
+        TraceLog(LOG_WARNING, "AUDIO: nao foi possivel carregar %s", caminho);
     apresentacao_volumes(j);
     for (int i = 0; i < 2; i++) j->dispositivo[i] = -2;
     filtrar_modelos(&j->recursos);
