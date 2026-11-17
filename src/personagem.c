@@ -12,59 +12,6 @@
 #include "personagem.h"
 #include "config.h"
 
-/*
- * PROVISÓRIO: corpo genérico de 1,72 m, igual para todos, até a arte entregar
- * as medidas de cada modelo (tabelas em docs/ASSETS.md). As diferenças de
- * jogo entre os personagens vêm por enquanto das massas e das forças.
- */
-#define CORPO_GENERICO                                                        \
-    .centro = {                                                               \
-        [PARTE_BACIA]       = {  0.00f, 0.93f,  0.0f },                       \
-        [PARTE_TRONCO]      = {  0.00f, 1.25f,  0.0f },                       \
-        [PARTE_CABECA]      = {  0.00f, 1.59f,  0.0f },                       \
-        [PARTE_BRACO_E]     = {  0.37f, 1.38f,  0.0f },                       \
-        [PARTE_BRACO_D]     = { -0.37f, 1.38f,  0.0f },                       \
-        [PARTE_ANTEBRACO_E] = {  0.67f, 1.38f,  0.0f },                       \
-        [PARTE_ANTEBRACO_D] = { -0.67f, 1.38f,  0.0f },                       \
-        [PARTE_COXA_E]      = {  0.12f, 0.62f,  0.0f },                       \
-        [PARTE_COXA_D]      = { -0.12f, 0.62f,  0.0f },                       \
-        [PARTE_CANELA_E]    = {  0.12f, 0.255f, 0.0f },                       \
-        [PARTE_CANELA_D]    = { -0.12f, 0.255f, 0.0f },                       \
-        [PARTE_PE_E]        = {  0.12f, 0.045f, 0.06f },                      \
-        [PARTE_PE_D]        = { -0.12f, 0.045f, 0.06f },                      \
-    },                                                                        \
-    .ancora = {                                                               \
-        [ART_CINTURA]     = {  0.00f, 1.04f, 0.0f },                          \
-        [ART_PESCOCO]     = {  0.00f, 1.46f, 0.0f },                          \
-        [ART_OMBRO_E]     = {  0.24f, 1.38f, 0.0f },                          \
-        [ART_OMBRO_D]     = { -0.24f, 1.38f, 0.0f },                          \
-        [ART_QUADRIL_E]   = {  0.12f, 0.82f, 0.0f },                          \
-        [ART_QUADRIL_D]   = { -0.12f, 0.82f, 0.0f },                          \
-        [ART_JOELHO_E]    = {  0.12f, 0.42f, 0.0f },                          \
-        [ART_JOELHO_D]    = { -0.12f, 0.42f, 0.0f },                          \
-        [ART_COTOVELO_E]  = {  0.50f, 1.38f, 0.0f },                          \
-        [ART_COTOVELO_D]  = { -0.50f, 1.38f, 0.0f },                          \
-        [ART_TORNOZELO_E] = {  0.12f, 0.09f, 0.0f },                          \
-        [ART_TORNOZELO_D] = { -0.12f, 0.09f, 0.0f },                          \
-    }
-
-#define TAMANHOS(larg_tronco, larg_bacia)                                     \
-    .tamanho = {                                                              \
-        [PARTE_BACIA]       = { (larg_bacia), 0.22f, 0.30f },                 \
-        [PARTE_TRONCO]      = { (larg_tronco), 0.42f, 0.34f },                \
-        [PARTE_CABECA]      = { 0.26f, 0.26f, 0.26f },                        \
-        [PARTE_BRACO_E]     = { 0.26f, 0.14f, 0.14f },                        \
-        [PARTE_BRACO_D]     = { 0.26f, 0.14f, 0.14f },                        \
-        [PARTE_ANTEBRACO_E] = { 0.34f, 0.12f, 0.12f },                        \
-        [PARTE_ANTEBRACO_D] = { 0.34f, 0.12f, 0.12f },                        \
-        [PARTE_COXA_E]      = { 0.18f, 0.40f, 0.20f },                        \
-        [PARTE_COXA_D]      = { 0.18f, 0.40f, 0.20f },                        \
-        [PARTE_CANELA_E]    = { 0.14f, 0.33f, 0.16f },                        \
-        [PARTE_CANELA_D]    = { 0.14f, 0.33f, 0.16f },                        \
-        [PARTE_PE_E]        = { 0.15f, 0.09f, 0.26f },                        \
-        [PARTE_PE_D]        = { 0.15f, 0.09f, 0.26f },                        \
-    }
-
 /* Ossos do rig do Mixamo (o Meshy usa o mesmo padrão) ligados às peças.
  * Mãos, dedos dos pés e o topo da cabeça seguem o osso pai. */
 static const OssoPeca OSSOS_MIXAMO[] = {
@@ -93,36 +40,84 @@ static const Personagem CATALOGO[] = {
         /* Po: pesado e lento, difícil de derrubar. */
         .nome = "Po",
         .pasta = "po",
-        CORPO_GENERICO,
-        TAMANHOS(0.48f, 0.42f),
-        /* 98 kg. Proporções de De Leva (1996), com mais peso no tronco e na
+        /* Âncoras pelo rig e volumes pela malha. As pernas usam caixas
+         * mais estreitas para separar coxas e canelas da barriga. */
+        .centro = {
+            [PARTE_BACIA        ] = {  0.000f,  0.622f, -0.008f },
+            [PARTE_TRONCO       ] = {  0.000f,  1.011f,  0.021f },
+            [PARTE_CABECA       ] = {  0.000f,  1.424f,  0.025f },
+            [PARTE_BRACO_E      ] = {  0.432f,  1.107f, -0.019f },
+            [PARTE_BRACO_D      ] = { -0.432f,  1.107f, -0.019f },
+            [PARTE_ANTEBRACO_E  ] = {  0.705f,  1.122f,  0.002f },
+            [PARTE_ANTEBRACO_D  ] = { -0.705f,  1.122f,  0.002f },
+            [PARTE_COXA_E       ] = {  0.246f,  0.382f, -0.027f },
+            [PARTE_COXA_D       ] = { -0.246f,  0.382f, -0.027f },
+            [PARTE_CANELA_E     ] = {  0.287f,  0.184f, -0.061f },
+            [PARTE_CANELA_D     ] = { -0.287f,  0.184f, -0.061f },
+            [PARTE_PE_E         ] = {  0.326f,  0.046f,  0.011f },
+            [PARTE_PE_D         ] = { -0.326f,  0.046f,  0.011f },
+        },
+        .tamanho = {
+            [PARTE_BACIA        ] = {  0.850f,  0.228f,  0.725f },
+            [PARTE_TRONCO       ] = {  0.739f,  0.493f,  0.638f },
+            [PARTE_CABECA       ] = {  0.432f,  0.267f,  0.388f },
+            [PARTE_BRACO_E      ] = {  0.274f,  0.248f,  0.205f },
+            [PARTE_BRACO_D      ] = {  0.274f,  0.248f,  0.205f },
+            [PARTE_ANTEBRACO_E  ] = {  0.299f,  0.202f,  0.213f },
+            [PARTE_ANTEBRACO_D  ] = {  0.299f,  0.202f,  0.213f },
+            [PARTE_COXA_E       ] = {  0.255f,  0.273f,  0.270f },
+            [PARTE_COXA_D       ] = {  0.255f,  0.273f,  0.270f },
+            [PARTE_CANELA_E     ] = {  0.235f,  0.240f,  0.205f },
+            [PARTE_CANELA_D     ] = {  0.235f,  0.240f,  0.205f },
+            [PARTE_PE_E         ] = {  0.205f,  0.092f,  0.255f },
+            [PARTE_PE_D         ] = {  0.205f,  0.092f,  0.255f },
+        },
+        .ancora = {
+            [ART_CINTURA      ] = {  0.000f,  0.736f,  0.000f },
+            [ART_PESCOCO      ] = {  0.000f,  1.242f,  0.000f },
+            [ART_OMBRO_E      ] = {  0.299f,  1.122f,  0.000f },
+            [ART_OMBRO_D      ] = { -0.299f,  1.122f,  0.000f },
+            [ART_COTOVELO_E   ] = {  0.548f,  1.058f,  0.000f },
+            [ART_COTOVELO_D   ] = { -0.548f,  1.058f,  0.000f },
+            [ART_QUADRIL_E    ] = {  0.191f,  0.524f,  0.000f },
+            [ART_QUADRIL_D    ] = { -0.191f,  0.524f,  0.000f },
+            [ART_JOELHO_E     ] = {  0.266f,  0.267f, -0.042f },
+            [ART_JOELHO_D     ] = { -0.266f,  0.267f, -0.042f },
+            [ART_TORNOZELO_E  ] = {  0.307f,  0.087f, -0.024f },
+            [ART_TORNOZELO_D  ] = { -0.307f,  0.087f, -0.024f },
+        },
+        .modelo = "po.glb",
+        .escala_modelo = 1.0f,
+        .ossos = OSSOS_MIXAMO,
+        .qtd_ossos = (int)(sizeof OSSOS_MIXAMO / sizeof OSSOS_MIXAMO[0]),
+        /* 110 kg. Proporções de De Leva (1996), com mais peso no tronco e na
          * bacia (barriga) e um pouco menos nos braços e nas coxas. */
         .massa = {
-            [PARTE_BACIA] = 13.7f, [PARTE_TRONCO] = 34.3f, [PARTE_CABECA] = 5.9f,
+            [PARTE_BACIA] = 20.2f, [PARTE_TRONCO] = 36.3f, [PARTE_CABECA] = 5.9f,
             [PARTE_BRACO_E] = 2.45f, [PARTE_BRACO_D] = 2.45f,
             [PARTE_ANTEBRACO_E] = 1.96f, [PARTE_ANTEBRACO_D] = 1.96f,
-            [PARTE_COXA_E] = 12.5f, [PARTE_COXA_D] = 12.5f,
+            [PARTE_COXA_E] = 14.25f, [PARTE_COXA_D] = 14.25f,
             [PARTE_CANELA_E] = 3.9f, [PARTE_CANELA_D] = 3.9f,
             [PARTE_PE_E] = 1.2f, [PARTE_PE_D] = 1.2f,
         },
         /* A barriga: o peso do tronco e da bacia fica à frente do meio. */
         .centro_massa = {
-            [PARTE_BACIA]  = { 0.0f,  0.00f, 0.04f },
-            [PARTE_TRONCO] = { 0.0f, -0.03f, 0.05f },
+            [PARTE_BACIA]  = {  0.000f,  0.000f,  0.030f },
+            [PARTE_TRONCO] = {  0.000f, -0.028f,  0.038f },
         },
-        .forca_equilibrio = 900.0f,
-        .forca_andar = 900.0f,
+        .forca_equilibrio = 1000.0f,
+        .forca_andar = 1050.0f,
         .velocidade_max = 1.3f,
         /* Panda pesado: base larga, passos lentos e curtos, bamboleia o
          * corpo todo ao andar e se desespera com os braços quando perde o
          * equilíbrio. */
         .estilo = {
-            .base_quadril = 0.35f, .base_abertura = 0.28f, .base_joelho = 0.40f,
+            .base_quadril = 0.35f, .base_abertura = 0.12f, .base_joelho = 0.40f,
             .inclinacao = 0.08f,
             .guarda_ombro = -1.10f, .guarda_frente = 0.40f, .guarda_cintura = 0.10f,
             .guarda_cotovelo = 0.45f,
             .balanco_parado = 1.2f,
-            .periodo_passo = 0.75f, .amplitude_passo = 0.45f,
+            .periodo_passo = 0.75f, .amplitude_passo = 0.64f,
             .balanco_bracos = 0.75f, .gingado = 0.12f,
             .reflexo_bracos = 1.2f, .passo_reacao = 0.85f,
         },
@@ -315,7 +310,7 @@ static const Personagem CATALOGO[] = {
          * tamanho do dos outros (os cascos são pequenos: com eles o touro,
          * pesado em cima, tombava); braço e canela têm a medida comprida no
          * sentido do membro (a cápsula segue a maior medida da caixa). */
-        .nome = "Minotauro",
+        .nome = "Kai",
         .pasta = "minotauro",
         .centro = {
             [PARTE_BACIA]       = {  0.000f, 0.700f, -0.022f },
@@ -393,6 +388,81 @@ static const Personagem CATALOGO[] = {
             .periodo_passo = 0.80f, .amplitude_passo = 0.45f,
             .balanco_bracos = 0.55f, .gingado = 0.08f,
             .reflexo_bracos = 1.0f, .passo_reacao = 0.9f,
+        },
+    },
+    {
+        /* Macaco: leve, com alcance longo e passos rápidos. */
+        .nome = "Macaco",
+        .pasta = "macaco",
+        .centro = {
+            [PARTE_BACIA        ] = {  0.000f,  0.696f, -0.015f },
+            [PARTE_TRONCO       ] = {  0.000f,  1.061f, -0.010f },
+            [PARTE_CABECA       ] = {  0.000f,  1.420f,  0.014f },
+            [PARTE_BRACO_E      ] = {  0.430f,  1.228f, -0.047f },
+            [PARTE_BRACO_D      ] = { -0.430f,  1.228f, -0.047f },
+            [PARTE_ANTEBRACO_E  ] = {  0.736f,  1.210f,  0.014f },
+            [PARTE_ANTEBRACO_D  ] = { -0.736f,  1.210f,  0.014f },
+            [PARTE_COXA_E       ] = {  0.200f,  0.457f, -0.006f },
+            [PARTE_COXA_D       ] = { -0.200f,  0.457f, -0.006f },
+            [PARTE_CANELA_E     ] = {  0.230f,  0.214f, -0.066f },
+            [PARTE_CANELA_D     ] = { -0.230f,  0.214f, -0.066f },
+            [PARTE_PE_E         ] = {  0.268f,  0.049f,  0.010f },
+            [PARTE_PE_D         ] = { -0.268f,  0.049f,  0.010f },
+        },
+        .tamanho = {
+            [PARTE_BACIA        ] = {  0.689f,  0.208f,  0.581f },
+            [PARTE_TRONCO       ] = {  0.747f,  0.457f,  0.584f },
+            [PARTE_CABECA       ] = {  0.424f,  0.240f,  0.347f },
+            [PARTE_BRACO_E      ] = {  0.280f,  0.177f,  0.210f },
+            [PARTE_BRACO_D      ] = {  0.280f,  0.177f,  0.210f },
+            [PARTE_ANTEBRACO_E  ] = {  0.318f,  0.140f,  0.230f },
+            [PARTE_ANTEBRACO_D  ] = {  0.318f,  0.140f,  0.230f },
+            [PARTE_COXA_E       ] = {  0.260f,  0.290f,  0.300f },
+            [PARTE_COXA_D       ] = {  0.260f,  0.290f,  0.300f },
+            [PARTE_CANELA_E     ] = {  0.200f,  0.220f,  0.210f },
+            [PARTE_CANELA_D     ] = {  0.200f,  0.220f,  0.210f },
+            [PARTE_PE_E         ] = {  0.210f,  0.098f,  0.290f },
+            [PARTE_PE_D         ] = {  0.210f,  0.098f,  0.290f },
+        },
+        .ancora = {
+            [ART_CINTURA      ] = {  0.000f,  0.810f,  0.000f },
+            [ART_PESCOCO      ] = {  0.000f,  1.280f,  0.035f },
+            [ART_OMBRO_E      ] = {  0.300f,  1.240f, -0.045f },
+            [ART_OMBRO_D      ] = { -0.300f,  1.240f, -0.045f },
+            [ART_COTOVELO_E   ] = {  0.560f,  1.230f, -0.010f },
+            [ART_COTOVELO_D   ] = { -0.560f,  1.230f, -0.010f },
+            [ART_QUADRIL_E    ] = {  0.230f,  0.600f,  0.000f },
+            [ART_QUADRIL_D    ] = { -0.230f,  0.600f,  0.000f },
+            [ART_JOELHO_E     ] = {  0.260f,  0.310f, -0.025f },
+            [ART_JOELHO_D     ] = { -0.260f,  0.310f, -0.025f },
+            [ART_TORNOZELO_E  ] = {  0.280f,  0.100f, -0.040f },
+            [ART_TORNOZELO_D  ] = { -0.280f,  0.100f, -0.040f },
+        },
+        /* 70 kg, com parte da massa concentrada nos braços compridos. */
+        .massa = {
+            [PARTE_BACIA] = 8.6f, [PARTE_TRONCO] = 21.0f, [PARTE_CABECA] = 4.2f,
+            [PARTE_BRACO_E] = 2.5f, [PARTE_BRACO_D] = 2.5f,
+            [PARTE_ANTEBRACO_E] = 2.0f, [PARTE_ANTEBRACO_D] = 2.0f,
+            [PARTE_COXA_E] = 9.6f, [PARTE_COXA_D] = 9.6f,
+            [PARTE_CANELA_E] = 2.8f, [PARTE_CANELA_D] = 2.8f,
+            [PARTE_PE_E] = 1.2f, [PARTE_PE_D] = 1.2f,
+        },
+        .modelo = "macaco.glb",
+        .escala_modelo = 1.0f,
+        .ossos = OSSOS_MIXAMO,
+        .qtd_ossos = (int)(sizeof OSSOS_MIXAMO / sizeof OSSOS_MIXAMO[0]),
+        .forca_equilibrio = 680.0f,
+        .forca_andar = 800.0f,
+        .velocidade_max = 1.8f,
+        .estilo = {
+            .base_quadril = 0.32f, .base_abertura = 0.17f, .base_joelho = 0.38f,
+            .inclinacao = 0.09f,
+            .guarda_ombro = -0.90f, .guarda_frente = 0.55f, .guarda_cintura = 0.14f,
+            .guarda_cotovelo = 0.55f,
+            .balanco_parado = 0.9f,
+            .periodo_passo = 0.49f, .amplitude_passo = 0.62f,
+            .balanco_bracos = 0.60f, .gingado = 0.07f,
+            .reflexo_bracos = 1.05f, .passo_reacao = 1.15f,
         },
     },
 };
