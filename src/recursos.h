@@ -5,7 +5,7 @@
  * para lá depois de compilar — use GetApplicationDirectory()):
  *   assets/modelos/<pasta do personagem>/<Personagem.modelo>
  *       ex.: assets/modelos/tai_lung/tai_lung.glb  (um .glb com esqueleto; ver pele.h)
- *   assets/sons/<nome>.wav  (nomes na tabela de SomJogo, em recursos.c)
+ *   assets/sons/<nome>.wav ou .ogg  (nomes na tabela de SomJogo, em recursos.c)
  *
  * Arquivo faltando NÃO é erro: o jogo precisa rodar antes da arte ficar
  * pronta. Faltou um modelo -> a pele fica vazia (o render desenha caixas).
@@ -31,6 +31,7 @@ typedef enum {
     SOM_VITORIA,         /* "vitoria.wav"        */
     SOM_MENU_MOVER,      /* "menu_mover.wav"     */
     SOM_MENU_CONFIRMAR,  /* "menu_confirmar.wav" */
+    SOM_MENU_ABERTURA,   /* "menu_abertura.ogg"  (toca uma vez ao abrir o menu) */
     SOM_QTD
 } SomJogo;
 

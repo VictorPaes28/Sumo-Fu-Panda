@@ -18,6 +18,7 @@ static const char *const ARQUIVOS_SONS[SOM_QTD] = {
     [SOM_VITORIA]        = "vitoria.wav",
     [SOM_MENU_MOVER]     = "menu_mover.wav",
     [SOM_MENU_CONFIRMAR] = "menu_confirmar.wav",
+    [SOM_MENU_ABERTURA]  = "menu_abertura.ogg",
 };
 
 void recursos_carregar(Recursos *r)

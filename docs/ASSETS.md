@@ -87,7 +87,7 @@ avisa no console (`PELE: osso ... não existe`).
 
 ## Sons
 
-Gerados no rFXGen (ou outra fonte livre), em `.wav`, em `assets/sons/`:
+Em `assets/sons/`, em `.wav` (ou `.ogg`):
 
 | Arquivo | Quando toca | Origem |
 |---|---|---|
@@ -95,14 +95,25 @@ Gerados no rFXGen (ou outra fonte livre), em `.wav`, em `assets/sons/`:
 | `golpe_forte.wav` | acerto de golpe forte | gerado no rFXGen |
 | `queda.wav` | alguém caiu ou saiu do ringue | gerado no rFXGen |
 | `contagem.wav` | cada número do 3, 2, 1 | gerado no rFXGen |
-| `lute.wav` | início da luta | gerado no rFXGen |
+| `lute.wav` | início da luta (depois do 3, 2, 1) | gongo chinês: trecho do vídeo "Chinese Gong Sound Effect" do canal Supa Sounds (YouTube) |
 | `vitoria.wav` | fim da partida | gerado no rFXGen |
 | `menu_mover.wav` | mover o cursor nos menus | gerado no rFXGen |
 | `menu_confirmar.wav` | confirmar nos menus | gerado no rFXGen |
+| `menu_abertura.ogg` | uma vez, toda vez que o menu inicial abre | trecho (4,5 s) de "Closing Act (feat. lil nico)", de Scream Geronimo |
 
-Origem: os 8 sons foram gerados pelo grupo no **rFXGen** (versão no navegador,
+Origem: 7 sons foram gerados pelo grupo no **rFXGen** (versão no navegador,
 https://raylibtech.itch.io/rfxgen) em 2026-11-14, a partir dos presets e com os parâmetros
-ajustados à mão. Nenhum som veio da internet. Formato: WAV, 44100 Hz, 16 bits, mono;
-até 1 s cada (a `vitoria`, até 2 s); a pasta inteira tem cerca de 230 KB.
+ajustados à mão. Formato: WAV, 44100 Hz, 16 bits, mono; até 1 s cada (a `vitoria`, até 2 s).
+
+Em 2026-11-17 entraram dois áudios de terceiros, **sem licença livre**, usados só porque o
+jogo é um trabalho acadêmico, sem fins lucrativos, apresentado apenas na disciplina
+(decisão do grupo):
+- `lute.wav`: o gongo, com o silêncio do começo cortado, 2,5 s com o som sumindo no final e
+  volume ajustado aos outros sons (WAV, 44100 Hz, 16 bits, mono).
+- `menu_abertura.ogg`: os 4,5 primeiros segundos da música, com 0,3 s de saída suave.
+
+Se o jogo for publicado ou usado fora da disciplina, esses dois precisam ser trocados por
+áudios próprios ou livres (por exemplo, o gongo CC BY 4.0 de kevp888 no Freesound:
+https://freesound.org/people/kevp888/sounds/711170/, creditando o autor).
 
 Arquivo faltando não quebra o jogo: ele só fica sem aquele som ou modelo (desenha caixas).

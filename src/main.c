@@ -71,6 +71,15 @@ static void tocar_sons_da_partida(const Jogo *j)
     if (e->fim_partida)       recursos_tocar(&j->recursos, SOM_VITORIA);
 }
 
+/* Volta (ou chega) ao menu inicial. O som de abertura toca toda vez que o
+ * menu abre: ao ligar o jogo e ao voltar de outra tela. */
+static void abrir_menu(Jogo *j)
+{
+    menu_iniciar(&j->menu);
+    j->tela = TELA_MENU;
+    recursos_tocar(&j->recursos, SOM_MENU_ABERTURA);
+}
+
 static void encerrar_luta(Jogo *j)
 {
     if (j->partida_ativa) {
@@ -88,8 +97,7 @@ static void iniciar_luta(Jogo *j)
         j->tela = TELA_LUTA;
     } else {
         TraceLog(LOG_ERROR, "Falha ao iniciar a partida");
-        menu_iniciar(&j->menu);
-        j->tela = TELA_MENU;
+        abrir_menu(j);
     }
 }
 
@@ -126,8 +134,7 @@ static void atualizar_luta(Jogo *j, const Intencao in[2], float dt)
     if (p->pausada) {
         if (in[0].b || in[1].b) {          /* pausado + B = sair para o menu */
             encerrar_luta(j);
-            menu_iniciar(&j->menu);
-            j->tela = TELA_MENU;
+            abrir_menu(j);
         }
         return;
     }
@@ -181,8 +188,7 @@ static void atualizar(Jogo *j, float dt)
             montagem_iniciar(&j->montagem);
             j->tela = TELA_MONTAGEM;
         } else if (a == SELECAO_VOLTAR) {
-            menu_iniciar(&j->menu);
-            j->tela = TELA_MENU;
+            abrir_menu(j);
         }
     } break;
 
@@ -210,8 +216,7 @@ static void atualizar(Jogo *j, float dt)
             montagem_iniciar(&j->montagem);
             j->tela = TELA_MONTAGEM;
         } else if (a == RESULTADO_MENU) {
-            menu_iniciar(&j->menu);
-            j->tela = TELA_MENU;
+            abrir_menu(j);
         }
     } break;
     }
@@ -273,8 +278,7 @@ int main(void)
         j->jogadores[i].personagem = 0;
         combo_iniciar(&j->jogadores[i].combo);
     }
-    menu_iniciar(&j->menu);
-    j->tela = TELA_MENU;
+    abrir_menu(j);
 
     while (!WindowShouldClose() && !j->sair) {
         float dt = GetFrameTime();
