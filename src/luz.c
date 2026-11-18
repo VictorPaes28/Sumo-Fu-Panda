@@ -2,7 +2,7 @@
  * luz.c — shader de iluminação simples (GLSL 330, OpenGL 3.3 da raylib).
  * Especificação: luz.h
  *
- * Dono: Principal.
+ * Dono: Victor.
  */
 #include <stddef.h>
 #include "luz.h"

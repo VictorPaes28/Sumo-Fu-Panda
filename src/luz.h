@@ -12,7 +12,7 @@
  *
  * Usado só nos modelos (pele). O ringue e as caixas continuam sem luz.
  *
- * Dono: Principal.
+ * Dono: Victor.
  */
 #ifndef LUZ_H
 #define LUZ_H

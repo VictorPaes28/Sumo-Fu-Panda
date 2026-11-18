@@ -9,7 +9,7 @@
  * Como há vários passos de física por quadro, a partida junta (OU lógico)
  * os EventosCombate de todos os passos do quadro em Partida.eventos.
  *
- * Dono: Principal.
+ * Dono: Victor.
  */
 #ifndef COMBATE_H
 #define COMBATE_H

@@ -42,33 +42,33 @@ que enfraquece o equilíbrio do adversário até curar (lista ordenada + inserti
 | Módulo | O que faz | Usa raylib | Usa ODE | Dono |
 |---|---|:-:|:-:|---|
 | `config.h` | constantes ajustáveis | | | todos (cada um na sua área) |
-| `esqueleto` | peças, articulações, `Pose` | | | B |
-| `golpe` | catálogo de golpes | | | B (tabela) / Principal (valores) |
-| `personagem` | catálogo de personagens | | | B (tabela) / Principal (valores) |
-| **`combo`** | **lista circular duplamente encadeada** | | | **A** |
-| **`hematoma`** | **lista ordenada + insertion sort** | | | **A** |
-| `entrada` | controle/teclado → `Intencao` | ✓ | | B |
-| `recursos` | carregar modelos e sons | ✓ | | B |
-| `telas` | menu, seleção, resultado | ✓ | | B |
-| `montagem` | tela de montagem do combo | ✓ | | B |
-| `hud` | desenho 2D por cima da luta | ✓ | | B |
-| `ui` | cores e funções de desenho 2D comuns (telas, montagem, HUD) | ✓ | | B |
-| `pele` | modelo com esqueleto cujos ossos seguem as peças físicas | ✓ | | Principal |
-| `animacao` | animações reais (parado, andar) como ângulos das articulações; `animacoes_dados.c` é gerado | | | Principal |
-| `luz` | shader de iluminação simples dos modelos (direcional + ambiente + contorno) | ✓ | | Principal |
-| `fisica` | mundo do ODE, passo fixo, contatos | | ✓ | Principal |
-| `corpo` | corpo articulado, motores, equilíbrio | ✓ | ✓ | Principal |
-| `lutador` | corpo + stamina + hematomas + golpe | ✓ | | Principal |
-| `combate` | contatos → acertos | ✓ | | Principal |
-| `partida` | rounds, placar, laço da física | ✓ | | Principal |
-| `render` | câmera, ringue, corpos em 3D | ✓ | | Principal |
-| `main.c` | janela, telas, sons, laço principal | ✓ | | Principal |
+| `esqueleto` | peças, articulações, `Pose` | | | Arthur |
+| `golpe` | catálogo de golpes | | | Arthur (tabela) / Victor e Breno (valores) |
+| `personagem` | catálogo de personagens | | | Arthur (tabela) / Victor (valores) |
+| **`combo`** | **lista circular duplamente encadeada** | | | **Mateus** |
+| **`hematoma`** | **lista ordenada + insertion sort** | | | **Mateus** |
+| `entrada` | controle/teclado → `Intencao` | ✓ | | Arthur |
+| `recursos` | carregar modelos e sons | ✓ | | Arthur |
+| `telas` | menu, seleção, resultado | ✓ | | Arthur |
+| `montagem` | tela de montagem do combo | ✓ | | Arthur |
+| `hud` | desenho 2D por cima da luta | ✓ | | Arthur |
+| `ui` | cores e funções de desenho 2D comuns (telas, montagem, HUD) | ✓ | | Arthur |
+| `pele` | modelo com esqueleto cujos ossos seguem as peças físicas | ✓ | | Victor |
+| `animacao` | animações reais (parado, andar) como ângulos das articulações; `animacoes_dados.c` é gerado | | | Victor |
+| `luz` | shader de iluminação simples dos modelos (direcional + ambiente + contorno) | ✓ | | Victor |
+| `fisica` | mundo do ODE, passo fixo, contatos | | ✓ | Victor |
+| `corpo` | corpo articulado, motores, equilíbrio | ✓ | ✓ | Victor; Breno (passadas) |
+| `lutador` | corpo + stamina + hematomas + golpe | ✓ | | Victor |
+| `combate` | contatos → acertos | ✓ | | Victor |
+| `partida` | rounds, placar, laço da física | ✓ | | Victor |
+| `render` | câmera, ringue, corpos em 3D | ✓ | | Victor |
+| `main.c` | janela, telas, sons, laço principal | ✓ | | Victor |
 
 ## 4. Dependências (quem pode incluir quem)
 
 ```
 main.c
-  |-- telas, montagem, hud, recursos, entrada      (Integrante B)
+  |-- telas, montagem, hud, recursos, entrada      (interface)
   |     recursos ----> pele -> personagem          (sem ODE)
   |-- render ----------> partida, recursos, corpo
   `-- partida ---------> fisica, lutador, combate, hud (só o tipo InfoHud)
@@ -89,7 +89,7 @@ Sobre o ODE: `corpo.h` e `fisica.h` incluem `ode/ode.h` porque as structs guarda
 tipos do ODE (`dBodyID`, `dWorldID`), então quem inclui `lutador.h` ou `partida.h`
 recebe o cabeçalho do ODE junto. A regra é: **só `fisica.c` e `corpo.c` chamam funções
 do ODE ou mexem nos campos do ODE**. Os outros módulos usam as funções de `corpo.h`.
-Os módulos do Integrante B não incluem nenhum desses cabeçalhos.
+Os módulos de interface não incluem nenhum desses cabeçalhos.
 
 **Nunca copie `Partida`, `Lutador`, `Corpo` ou `Fisica` por valor.** As formas do ODE
 guardam ponteiros para dentro do `Corpo`; uma cópia deixa esses ponteiros apontando
@@ -112,13 +112,16 @@ O combo é do **Jogador**, não do Lutador: assim ele sobrevive à troca de roun
 ## 6. Fluxo de telas (`main.c`)
 
 ```
-MENU -> SELECAO -> MONTAGEM -> LUTA -> RESULTADO
-          ^  voltar   ^  voltar          | revanche -> LUTA
-          |           +---- remontar ----+ menu -> MENU
+MENU -> ENTRADA -> SELECAO -> ARENA -> MONTAGEM -> VERSUS -> LUTA -> RESULTADO
+Torneio: INSCRICAO -> CHAVE -> ENTRADA; o RESULTADO avança a chave.
+RESULTADO: revanche -> LUTA, remontar -> MONTAGEM, menu -> MENU
 ```
 
-Cada tela segue o padrão `xxx_iniciar` / `acao = xxx_atualizar(tela, in)` / `xxx_desenhar(tela)`.
-Telas não trocam de tela nem tocam sons: devolvem uma ação, e o `main.c` decide.
+A lógica de cada tela segue o padrão `xxx_iniciar` / `acao = xxx_atualizar(tela, in)`
+(`telas.c`, `montagem.c`): as telas não trocam de tela nem tocam sons; devolvem uma ação,
+e o `main.c` decide. O desenho das telas do jogo, do torneio e do HUD da luta fica no
+`main.c` (funções `apresentacao_*`). As funções `xxx_desenhar` de `telas.c`, `montagem.c`
+e `hud.c` são as versões anteriores e hoje só o `demo_telas` as usa.
 
 ## 7. Um quadro da luta (`partida_atualizar`)
 
@@ -295,10 +298,3 @@ jogo (a cada passo):   alvo = guarda/golpe (parte de cima) + base de sumô (pern
   por animações do Mixamo, ver `docs/ANIMACOES.md` (`extrai_animacoes --golpe`).
 - **Cotovelo físico:** o antebraço é uma peça (`PARTE_ANTEBRACO_*`, `ART_COTOVELO_*`); a guarda
   do personagem (`guarda_cotovelo`) mais o golpe dobram a junta de verdade.
-
-## 11. Plano B (se a física precisar ser trocada)
-
-A verificação da semana 1 passou (ver `docs/tarefas/TAREFA-PRINCIPAL.md`), então o plano B
-não é necessário hoje. Se um dia for, só `corpo.c` e `fisica.c` mudam:
-o corpo passa a ser uma cápsula com física simples e o ODE fica só para o ragdoll da queda.
-As funções de `corpo.h` continuam as mesmas, então nenhum outro módulo muda.

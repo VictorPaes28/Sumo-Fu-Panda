@@ -1,9 +1,9 @@
 /*
  * combo.c — LISTA CIRCULAR DUPLAMENTE ENCADEADA de golpes.
- * Especificação completa: combo.h e docs/tarefas/TAREFA-A-estruturas.md
+ * Especificação completa: combo.h
  * Testes: testes/teste_combo.c
  *
- * Dono: Integrante A.
+ * Dono: Mateus.
  */
 #include <stdlib.h>
 #include "combo.h"

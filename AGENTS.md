@@ -14,15 +14,15 @@ verificações (`docs/ARQUITETURA.md`, seção 10).
 ## Leitura obrigatória, nesta ordem
 
 1. `docs/ARQUITETURA.md` — módulos, quem chama quem, o que acontece em um quadro.
-2. O arquivo de tarefa da pessoa que você está ajudando, em `docs/tarefas/`.
-3. Os `.h` dos módulos da tarefa, em `src/`. **Os `.h` são o contrato**: o comentário
+2. Os `.h` dos módulos que você vai mexer, em `src/`. **Os `.h` são o contrato**: o comentário
    de cada função diz exatamente o que ela deve fazer.
 
 ## Regras que você NÃO pode quebrar
 
 - **Não altere nenhum `.h`** sem que a pessoa diga explicitamente que o grupo aprovou.
   Os `.h` são usados por outros integrantes; mudar uma assinatura quebra o código deles.
-- **Só edite os arquivos listados na tarefa** da pessoa. Os outros têm outro dono.
+- **Só edite os arquivos de que a pessoa é dona** (comentário "Dono:" no início do arquivo).
+  Os outros têm outro dono.
 - **Não altere `testes/`** para fazer um teste passar. Corrija o código.
 - **C99 puro.** Nada de C++, nada de bibliotecas além de raylib, ODE e a biblioteca padrão do C.
 - **Sem variáveis globais.** O estado vive em structs passadas por ponteiro.
@@ -78,7 +78,6 @@ Verificações da física e da partida (sem janela):
 - O código compila **sem avisos** com `-Wall -Wextra`.
 - Os testes passam (`ctest`), e `demo_fisica --teste` e `demo_partida --teste` passam
   se você mexeu em física, golpes, personagens, partida ou `config.h`.
-- Os critérios de aceite do arquivo de tarefa foram conferidos um por um.
 - Nenhum `.h` e nenhum arquivo de outro dono foi alterado.
 - Se algo no contrato parecer errado ou faltar, **pare e avise a pessoa**
   em vez de mudar o `.h` por conta própria.

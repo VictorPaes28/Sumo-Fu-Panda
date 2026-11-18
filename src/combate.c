@@ -2,7 +2,7 @@
  * combate.c — contatos físicos viram acertos.
  * Especificação: combate.h
  *
- * Dono: Principal.
+ * Dono: Victor.
  */
 #include <math.h>
 #include "combate.h"

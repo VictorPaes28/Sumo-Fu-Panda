@@ -14,7 +14,7 @@
  *       e imprime .centro e .tamanho prontos para colar em personagem.c, além
  *       de quanto da malha fica fora das caixas atuais e das novas.
  *
- * Dono: Principal (ferramenta da equipe de arte).
+ * Dono: Victor (ferramenta da equipe de arte).
  */
 #include <stdio.h>
 #include <stdlib.h>

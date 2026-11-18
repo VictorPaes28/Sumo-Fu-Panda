@@ -8,7 +8,7 @@
  * jogo (não existe no corpo humano), a mesma ideia usada em Gang Beasts.
  * Com dano, a mola enfraquece e o lutador cambaleia.
  *
- * Dono: Principal.
+ * Dono: Victor; Breno (passadas e sustentação do corpo).
  */
 #include <math.h>
 #include "corpo.h"

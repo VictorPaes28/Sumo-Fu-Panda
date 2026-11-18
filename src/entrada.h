@@ -17,7 +17,7 @@
  *   Jogador 1: WASD mover/direcional, C = a, X = b, Z = y, V = firmar, TAB = start
  *   Jogador 2: setas mover/direcional, K = a, J = b, U = y, L = firmar, ENTER = start
  *
- * Dono: Integrante B.
+ * Dono: Arthur.
  */
 #ifndef ENTRADA_H
 #define ENTRADA_H

@@ -4,7 +4,7 @@
  * Só desenho: nenhuma função altera estado. Usado por telas.c, montagem.c
  * e hud.c, para todas as telas terem o mesmo visual.
  *
- * Dono: Integrante B.
+ * Dono: Arthur.
  */
 #ifndef UI_H
 #define UI_H

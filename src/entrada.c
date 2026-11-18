@@ -2,7 +2,7 @@
  * entrada.c — controle/teclado -> Intencao.
  * Especificação: entrada.h (tabela de botões e teclas).
  *
- * Dono: Integrante B.
+ * Dono: Arthur.
  */
 #include <math.h>
 #include "entrada.h"

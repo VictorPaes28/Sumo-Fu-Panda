@@ -24,7 +24,7 @@
  * do Mixamo (o mesmo do Meshy). Animações usadas: a que tem "Idle" no nome
  * (parado) e a que tem "Walk" (andar, sem "Jump").
  *
- * Dono: Principal.
+ * Dono: Victor.
  */
 #include <stdio.h>
 #include <stdlib.h>

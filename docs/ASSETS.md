@@ -30,7 +30,7 @@ Por isso, três coisas precisam bater:
    ./build/inspeciona_modelo assets/modelos/<pasta>/<pasta>.glb
    ```
    Mostra a altura, se os pés estão em y = 0 e a posição de cada osso, em metros.
-4. **Preencher `src/personagem.c`** (Integrante B):
+4. **Preencher `src/personagem.c`**:
    - **âncoras das articulações** = posição dos ossos (ombro = `LeftArm`, quadril = `LeftUpLeg`,
      joelho = `LeftLeg`, cintura = `Spine`, pescoço = `Neck`);
    - `.modelo`, `.escala_modelo` (1.0 depois do passo 2) e `.ossos = OSSOS_MIXAMO`;
@@ -45,7 +45,7 @@ Por isso, três coisas precisam bater:
 
    O Tai Lung já está feito assim e serve de exemplo.
 
-   **Modelo pintado sem rig** (o Meshy exportou só a malha, como o Oogway e o Minotauro):
+   **Modelo pintado sem rig** (o Meshy exportou só a malha, como o Oogway e o Kai):
    o esqueleto com os nomes do Mixamo foi montado no Blender (juntas pelos centros da malha,
    pesos automáticos, braços girados para a T-pose). Para a textura, use
    `preparar_modelo.py ... --textura 2048`: mantém só a cor, em PNG (a raylib do jogo não lê

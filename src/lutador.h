@@ -11,7 +11,7 @@
  * As formas do ODE guardam ponteiros para dentro do Corpo (refs); uma cópia
  * deixa esses ponteiros apontando para o lugar errado. Use sempre ponteiros.
  *
- * Dono: Principal.
+ * Dono: Victor.
  */
 #ifndef LUTADOR_H
 #define LUTADOR_H

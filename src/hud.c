@@ -11,7 +11,7 @@
  *   - os golpes do combo, com o próximo pulsando e uma faixa de cor nos
  *     golpes fortes (vermelha) e nos que seguram a faixa (verde).
  *
- * Dono: Integrante B.
+ * Dono: Arthur.
  */
 #include <math.h>
 #include <stddef.h>

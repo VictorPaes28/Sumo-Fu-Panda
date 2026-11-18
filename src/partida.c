@@ -2,7 +2,7 @@
  * partida.c — rounds, placar e o laço de passos fixos da física.
  * Especificação: partida.h. Ordem de um quadro: docs/ARQUITETURA.md, seção 7.
  *
- * Dono: Principal.
+ * Dono: Victor.
  */
 #include <math.h>
 #include "partida.h"

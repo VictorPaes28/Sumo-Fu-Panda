@@ -16,8 +16,8 @@
  * origem (0, 0, 0), na pose de criação (T-pose).
  * C puro: sem raylib e sem ODE.
  *
- * Dono: Integrante B cria a tabela com as medidas da arte.
- *       O Principal ajusta massas e forças depois dos testes de física.
+ * Dono: Arthur cria a tabela com as medidas da arte.
+ *       Victor ajusta massas e forças depois dos testes de física.
  */
 #ifndef PERSONAGEM_H
 #define PERSONAGEM_H

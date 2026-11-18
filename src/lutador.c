@@ -2,7 +2,7 @@
  * lutador.c — um lutador durante um round.
  * Especificação: lutador.h. Fases do golpe: golpe.h.
  *
- * Dono: Principal.
+ * Dono: Victor.
  */
 #include <math.h>
 #include "lutador.h"

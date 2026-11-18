@@ -2,7 +2,7 @@
  * telas.c — menu, seleção de personagem e resultado.
  * Especificação: telas.h
  *
- * Dono: Integrante B.
+ * Dono: Arthur.
  */
 #include <math.h>
 #include <stddef.h>

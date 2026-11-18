@@ -22,7 +22,7 @@
  * (FISICA_ATRITO_PES; a ponta do pé firma mais, FISICA_ATRITO_PONTA); o resto
  * do corpo arrasta (FISICA_ATRITO_CORPO_CHAO).
  *
- * Dono: Principal.
+ * Dono: Victor.
  */
 #ifndef FISICA_H
 #define FISICA_H

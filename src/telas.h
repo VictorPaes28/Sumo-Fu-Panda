@@ -11,7 +11,7 @@
  * As telas não tocam sons nem trocam de tela sozinhas: elas devolvem uma
  * ação, e o main.c decide. As telas só desenham em 2D (DrawText, DrawRectangle...).
  *
- * Dono: Integrante B.
+ * Dono: Arthur.
  */
 #ifndef TELAS_H
 #define TELAS_H

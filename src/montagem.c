@@ -2,7 +2,7 @@
  * montagem.c — tela de montagem do combo.
  * Especificação: montagem.h (controles). Usa só as funções de combo.h.
  *
- * Dono: Integrante B.
+ * Dono: Arthur.
  */
 #include <math.h>
 #include <stdio.h>

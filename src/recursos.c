@@ -2,7 +2,7 @@
  * recursos.c — carrega e libera modelos e sons.
  * Especificação: recursos.h e docs/ASSETS.md
  *
- * Dono: Integrante B.
+ * Dono: Arthur.
  */
 #include <stddef.h>
 #include "recursos.h"

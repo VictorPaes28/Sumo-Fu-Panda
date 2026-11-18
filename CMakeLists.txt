@@ -4,8 +4,8 @@
 # Alvos:
 #   teste_combo, teste_hematoma  testes das estruturas de dados (C puro, sem raylib/ODE)
 #   jogo                         o jogo completo (baixa raylib 6.0 e ODE 0.16.6)
-#   demo_telas                   demonstração das telas 2D, sem física (Integrante B)
-#   demo_fisica                  demonstração de um corpo articulado, sem telas (Principal)
+#   demo_telas                   demonstração das telas 2D, sem física (Arthur)
+#   demo_fisica                  demonstração de um corpo articulado, sem telas (Victor)
 #
 # Precisa de compilador C e C++ (gcc e g++ do MinGW-w64): o ODE é C++ por dentro.
 #
@@ -109,8 +109,7 @@ add_custom_target(copiar_assets
 add_dependencies(jogo copiar_assets)
 
 # -----------------------------------------------------------------------------
-# Demonstração da física (Principal) — um corpo articulado sozinho, sem telas.
-# Serve para a verificação da semana 1 sem depender do trabalho de A e B.
+# Demonstração da física (Victor) — um corpo articulado sozinho, sem telas.
 # Só é criada quando demos/demo_fisica.c existir.
 # -----------------------------------------------------------------------------
 if(EXISTS ${CMAKE_SOURCE_DIR}/demos/demo_fisica.c)
@@ -125,7 +124,7 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/demos/demo_fisica.c)
 endif()
 
 # -----------------------------------------------------------------------------
-# Demonstração da partida contra um robô (Principal) — luta sem os menus.
+# Demonstração da partida contra um robô (Victor) — luta sem os menus.
 # Usa todo o src/ menos o main.c. Só é criada quando demos/demo_partida.c existir.
 # -----------------------------------------------------------------------------
 if(EXISTS ${CMAKE_SOURCE_DIR}/demos/demo_partida.c)
@@ -160,7 +159,7 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/ferramentas/extrai_animacoes.c)
 endif()
 
 # -----------------------------------------------------------------------------
-# Demonstração das telas 2D (Integrante B) — sem física, sem ODE
+# Demonstração das telas 2D (Arthur) — sem física, sem ODE
 # Só é criada quando demos/demo_telas.c existir.
 # -----------------------------------------------------------------------------
 if(EXISTS ${CMAKE_SOURCE_DIR}/demos/demo_telas.c)

@@ -2,7 +2,7 @@
  * fisica.c — mundo do ODE, passo fixo e registro de contatos.
  * Especificação: fisica.h
  *
- * Dono: Principal.
+ * Dono: Victor.
  */
 #include <math.h>
 #include <string.h>

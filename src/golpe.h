@@ -5,8 +5,8 @@
  * O combo (combo.h) guarda só o TipoGolpe; os dados vêm daqui.
  * C puro: sem raylib e sem ODE.
  *
- * Dono: Integrante B cria a tabela com nomes, descrições e valores provisórios.
- *       O Principal ajusta poses e forças depois dos testes de física.
+ * Dono: Arthur cria a tabela com nomes, descrições e valores provisórios.
+ *       Victor e Breno ajustam poses e forças depois dos testes de física.
  */
 #ifndef GOLPE_H
 #define GOLPE_H

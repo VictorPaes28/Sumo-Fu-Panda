@@ -2,7 +2,7 @@
  * ui.c — cores e funções de desenho 2D comuns.
  * Especificação: ui.h
  *
- * Dono: Integrante B.
+ * Dono: Arthur.
  */
 #include "ui.h"
 

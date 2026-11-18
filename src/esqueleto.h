@@ -5,7 +5,7 @@
  * pelos golpes (golpe.c), pelos personagens (personagem.c) e pelos modelos
  * (recursos.c). Só tipos e funções simples: C puro, sem raylib e sem ODE.
  *
- * Dono: Integrante B (esqueleto.c). Mudanças nos enums: combinar com o Principal.
+ * Dono: Arthur (esqueleto.c). Mudanças nos enums: combinar com o Victor.
  *
  * Pose de criação: o corpo é criado na mesma pose em que os modelos foram
  * feitos no Meshy (T-pose: braços abertos na horizontal, pernas retas).

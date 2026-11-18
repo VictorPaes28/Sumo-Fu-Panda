@@ -13,7 +13,7 @@
  *
  * Teclas de desenvolvimento: F1 = modo de depuração (caixas físicas e FPS).
  *
- * Dono: Principal.
+ * Dono: Victor.
  */
 #include <math.h>
 #include <stdbool.h>

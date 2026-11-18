@@ -5,8 +5,8 @@
  * Coordenadas: T-pose, pés na origem, olhando para +Z, Y para cima,
  * esquerda do personagem = X positivo. Metros e quilogramas.
  *
- * Dono: Integrante B (tabela com as medidas da arte).
- *       Principal (ajuste de massas e forças).
+ * Dono: Arthur (tabela com as medidas da arte);
+ *       Victor (ajuste de massas e forças).
  */
 #include <stddef.h>
 #include "personagem.h"
@@ -299,7 +299,7 @@ static const Personagem CATALOGO[] = {
         },
     },
     {
-        /* Minotauro: o mais forte e o mais alto (1,78 m); empurra muito, mas
+        /* Kai: o mais forte e o mais alto (1,78 m); empurra muito, mas
          * é grande e anda devagar. Malha pintada do Meshy sem rig: esqueleto
          * com os nomes do Mixamo montado no Blender (juntas pelas fatias da
          * malha, pesos automáticos). Âncoras pelos ossos e caixas pela MALHA
@@ -311,7 +311,7 @@ static const Personagem CATALOGO[] = {
          * pesado em cima, tombava); braço e canela têm a medida comprida no
          * sentido do membro (a cápsula segue a maior medida da caixa). */
         .nome = "Kai",
-        .pasta = "minotauro",
+        .pasta = "kai",
         .centro = {
             [PARTE_BACIA]       = {  0.000f, 0.700f, -0.022f },
             [PARTE_TRONCO]      = {  0.000f, 1.100f, -0.026f },
@@ -370,7 +370,7 @@ static const Personagem CATALOGO[] = {
         .centro_massa = {
             [PARTE_TRONCO] = { 0.0f, 0.02f, 0.04f },
         },
-        .modelo = "minotauro.glb",
+        .modelo = "kai.glb",
         .escala_modelo = 1.0f,
         .ossos = OSSOS_MIXAMO,
         .qtd_ossos = (int)(sizeof OSSOS_MIXAMO / sizeof OSSOS_MIXAMO[0]),

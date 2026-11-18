@@ -12,7 +12,7 @@
  * Faltou um som -> tem_som = false (recursos_tocar não faz nada).
  * Cada arquivo faltando gera um aviso com TraceLog(LOG_WARNING, ...).
  *
- * Dono: Integrante B.
+ * Dono: Arthur.
  */
 #ifndef RECURSOS_H
 #define RECURSOS_H

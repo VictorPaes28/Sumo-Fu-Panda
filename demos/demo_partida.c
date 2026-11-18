@@ -13,7 +13,7 @@
  * O robô anda até o adversário e golpeia quando está perto. Serve para testar
  * a luta sem precisar de duas pessoas. Não faz parte do jogo final.
  *
- * Dono: Principal.
+ * Dono: Victor.
  */
 #include <stdio.h>
 #include <stdlib.h>

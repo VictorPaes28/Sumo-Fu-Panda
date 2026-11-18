@@ -2,7 +2,7 @@
  * esqueleto.c — nomes e tabelas das peças e articulações.
  * Especificação: esqueleto.h
  *
- * Dono: Integrante B.
+ * Dono: Arthur.
  */
 #include "esqueleto.h"
 

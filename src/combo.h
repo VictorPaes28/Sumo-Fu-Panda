@@ -18,7 +18,7 @@
  * seguindo ->prox.
  *
  * C puro: sem raylib e sem ODE (testado em testes/teste_combo.c).
- * Dono: Integrante A.
+ * Dono: Mateus.
  */
 #ifndef COMBO_H
 #define COMBO_H

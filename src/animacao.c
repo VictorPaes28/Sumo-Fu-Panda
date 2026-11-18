@@ -2,7 +2,7 @@
  * animacao.c — amostragem das animações convertidas.
  * Especificação: animacao.h. Dados: animacoes_dados.c (gerado).
  *
- * Dono: Principal.
+ * Dono: Victor.
  */
 #include <math.h>
 #include "animacao.h"

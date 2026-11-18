@@ -15,7 +15,7 @@
  *     para o alvo e o ciclo das pernas ao andar.
  *
  * Só fisica.c e corpo.c incluem o ODE.
- * Dono: Principal.
+ * Dono: Victor.
  */
 #ifndef CORPO_H
 #define CORPO_H

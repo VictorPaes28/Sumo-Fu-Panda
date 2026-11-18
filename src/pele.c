@@ -4,7 +4,7 @@
  *
  * Convenção das matrizes da raylib: MatrixMultiply(a, b) = aplica a, depois b.
  *
- * Dono: Principal.
+ * Dono: Victor.
  */
 #include <string.h>
 #include "pele.h"

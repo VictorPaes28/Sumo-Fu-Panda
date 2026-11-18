@@ -16,7 +16,7 @@
  * Por isso o modelo PRECISA estar na mesma pose de criação da física e as
  * medidas das peças (personagem.c) precisam bater com os ossos.
  *
- * Dono: Principal.
+ * Dono: Victor.
  */
 #ifndef PELE_H
 #define PELE_H

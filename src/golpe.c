@@ -2,8 +2,8 @@
  * golpe.c — catálogo de golpes (tabela constante).
  * Especificação e fases do golpe: golpe.h. Sinais dos ângulos: esqueleto.h.
  *
- * Dono: Integrante B (tabela, nomes e descrições).
- *       Principal (poses, tempos e forças, ajustados nos testes de física).
+ * Dono: Arthur (tabela, nomes e descrições);
+ *       Victor e Breno (poses, tempos e forças, ajustados nos testes de física).
  *
  * Como ler as chaves: CHAVE(tempo, cotovelo E, cotovelo D, articulações...).
  * Tudo é DIFERENÇA para a guarda e a base de sumô do personagem (rad):

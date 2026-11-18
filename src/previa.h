@@ -9,7 +9,7 @@
  * ATENÇÃO: como Fisica e Corpo, uma Previa nunca pode ser copiada por valor
  * (o ODE guarda ponteiros para dentro dela). Use sempre ponteiros.
  *
- * Dono: Principal.
+ * Dono: Victor.
  */
 #ifndef PREVIA_H
 #define PREVIA_H

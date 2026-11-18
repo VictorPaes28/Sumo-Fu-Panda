@@ -1,7 +1,7 @@
 /*
  * hud.h — informações desenhadas por cima da luta (2D).
  *
- * O HUD não conhece a Partida: o Principal preenche um InfoHud
+ * O HUD não conhece a Partida: o main.c preenche um InfoHud
  * (partida_preencher_hud) e o HUD só desenha o que recebeu.
  *
  * Layout sugerido:
@@ -12,7 +12,7 @@
  *   centro:            contagem (3, 2, 1, LUTE!) e mensagens (FORA!, CAIU!, EMPATE)
  *   pausado:           tela escurecida, "PAUSA", "Start: continuar  B: menu"
  *
- * Dono: Integrante B.
+ * Dono: Arthur.
  */
 #ifndef HUD_H
 #define HUD_H

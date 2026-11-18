@@ -72,7 +72,7 @@ mudam; o que importa é o movimento.
 
 Salve com o nome do golpe, por exemplo `empurrao.fbx`.
 
-### Como converter (Principal ou IA)
+### Como converter
 
 1. FBX → GLB mantendo a animação (Blender instalado):
    ```bash

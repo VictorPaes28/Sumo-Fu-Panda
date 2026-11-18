@@ -143,6 +143,4 @@ marque como substituída).
 - **Tempo limite do round?** Com robôs, alguns rounds demoram (há rounds de mais de 40 s no meio do
   ringue); com pessoas, provavelmente menos. Testar com a turma antes de decidir.
 
-- Modelo 3D do Po (hoje em blocos). Personagens: Po, Tai Lung, Oogway e Minotauro.
-- Valores finais de golpes, massas e forças (ajuste na semana 2).
 - O combo fica salvo entre execuções do jogo? (hoje: só enquanto o jogo está aberto)

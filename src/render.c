@@ -2,7 +2,7 @@
  * render.c — câmera, ringue e corpos em 3D.
  * Especificação: render.h
  *
- * Dono: Principal.
+ * Dono: Victor.
  */
 #include <math.h>
 #include <stdlib.h>

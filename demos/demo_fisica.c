@@ -10,8 +10,8 @@
  *   1..5   pose de golpe no corpo 0 (solta: volta à pose neutra)
  *   F      firmar (mola mais forte) R       recomeça
  *
- * Usa só fisica, corpo, personagem, esqueleto e golpe (ver docs/tarefas/TAREFA-PRINCIPAL.md).
- * Dono: Principal.
+ * Usa só fisica, corpo, personagem, esqueleto e golpe.
+ * Dono: Victor.
  */
 #include <stdio.h>
 #include <string.h>

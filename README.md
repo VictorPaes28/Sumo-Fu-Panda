@@ -22,9 +22,6 @@ equilíbrio próprios (`src/personagem.c`).
 | Você é... | Leia |
 |---|---|
 | Qualquer pessoa do grupo | `docs/ARQUITETURA.md` |
-| Integrante A (estruturas) | `docs/tarefas/TAREFA-A-estruturas.md` |
-| Integrante B (interface) | `docs/tarefas/TAREFA-B-interface.md` |
-| Principal (física e integração) | `docs/tarefas/TAREFA-PRINCIPAL.md` |
 | Equipe de arte | `docs/ASSETS.md` |
 | Golpes, animações e referências de sumô | `docs/ANIMACOES.md` |
 | Uma IA ajudando alguém | `AGENTS.md` |
@@ -77,7 +74,7 @@ demos/      programas de teste de partes do jogo
 ferramentas/ inspeciona_modelo (ossos de um .glb), preparar_modelo.py (FBX -> GLB, Blender)
             e extrai_animacoes (animações -> ângulos das articulações)
 assets/     modelos (.glb), sons e música (.wav) e fontes (.ttf)
-docs/       arquitetura, decisões, tarefas e guia de arte
+docs/       arquitetura, decisões, guia de arte e animações
 ```
 
 ## Controles
@@ -96,5 +93,5 @@ docs/       arquitetura, decisões, tarefas e guia de arte
 
 - Os `.h` são o contrato entre os integrantes: só mudam com acordo do grupo
   e atualização de `docs/ARQUITETURA.md` no mesmo commit.
-- Cada um edita só os arquivos da sua tarefa.
-- Uma branch por tarefa; pull request revisado antes de entrar na `main`.
+- Cada um edita só os arquivos de que é dono (comentário "Dono:" no início de cada arquivo).
+- Uma branch por assunto; pull request revisado antes de entrar na `main`.

@@ -27,7 +27,7 @@
  *   - quantidade <= HEMATOMAS_MAX
  *
  * C puro: sem raylib e sem ODE (testado em testes/teste_hematoma.c).
- * Dono: Integrante A.
+ * Dono: Mateus.
  */
 #ifndef HEMATOMA_H
 #define HEMATOMA_H

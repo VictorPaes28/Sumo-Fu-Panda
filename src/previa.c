@@ -2,7 +2,7 @@
  * previa.c — o lutador escolhido, ao vivo, na tela de seleção.
  * Especificação: previa.h
  *
- * Dono: Principal.
+ * Dono: Victor.
  */
 #include <math.h>
 #include "previa.h"

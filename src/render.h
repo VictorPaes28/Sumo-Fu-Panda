@@ -12,7 +12,7 @@
  * valendo o mesmo), chega mais perto quando os lutadores estão perto um do
  * outro (CAMERA_ZOOM_*) e treme com Partida.tremor.
  *
- * Dono: Principal.
+ * Dono: Victor.
  */
 #ifndef RENDER_H
 #define RENDER_H

@@ -16,7 +16,7 @@
  * Relógio: relogio só anda durante PARTIDA_LUTA e sem pausa. Hematomas e
  * golpes usam esse relógio, então nada cura durante a contagem ou a pausa.
  *
- * Dono: Principal.
+ * Dono: Victor.
  */
 #ifndef PARTIDA_H
 #define PARTIDA_H

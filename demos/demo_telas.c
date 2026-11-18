@@ -8,7 +8,7 @@
  * A "luta falsa" preenche um InfoHud à mão, com valores que mudam com o tempo,
  * para ver o HUD sem rodar a física. Aperte A (ou C/K) para ir ao resultado.
  *
- * Dono: Integrante B.
+ * Dono: Arthur.
  */
 #include <string.h>
 #include <math.h>

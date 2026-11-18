@@ -1,9 +1,9 @@
 /*
  * hematoma.c — LISTA ENCADEADA ORDENADA de hematomas + INSERTION SORT.
- * Especificação completa: hematoma.h e docs/tarefas/TAREFA-A-estruturas.md
+ * Especificação completa: hematoma.h
  * Testes: testes/teste_hematoma.c
  *
- * Dono: Integrante A.
+ * Dono: Mateus.
  */
 #include <stdlib.h>
 #include "hematoma.h"

@@ -12,7 +12,7 @@
  * Os dados ficam em animacoes_dados.c, GERADO pela ferramenta (não edite).
  * C puro: sem raylib e sem ODE.
  *
- * Dono: Principal.
+ * Dono: Victor.
  */
 #ifndef ANIMACAO_H
 #define ANIMACAO_H

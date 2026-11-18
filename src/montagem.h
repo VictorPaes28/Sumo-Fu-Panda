@@ -22,7 +22,7 @@
  * O combo de cada jogador NÃO é criado aqui: ele pertence ao Jogador
  * (partida.h) e já pode vir preenchido de uma partida anterior.
  *
- * Dono: Integrante B.
+ * Dono: Arthur.
  */
 #ifndef MONTAGEM_H
 #define MONTAGEM_H
