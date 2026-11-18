@@ -79,10 +79,10 @@ static bool atualizar_jogador(TelaMontagem *t, int i, Combo *combo, const Intenc
             t->cursor_combo[i] = combo->tamanho;
     }
 
-    if (in->y && pos < combo->tamanho && combo_trocar_com_proximo(combo, pos)) {
-        combo_reiniciar(combo);                             /* reorganizou: o combo recomeça */
+    /* O combo volta ao 1º golpe no começo de cada round (lutador_criar),
+     * então aqui a troca não precisa mexer no golpe atual. */
+    if (in->y && pos < combo->tamanho && combo_trocar_com_proximo(combo, pos))
         t->cursor_combo[i] = (pos + 1) % combo->tamanho;   /* o cursor acompanha o golpe */
-    }
 
     return false;
 }

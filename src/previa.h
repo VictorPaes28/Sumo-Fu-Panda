@@ -38,12 +38,6 @@ bool previa_criar(Previa *pv, int jogador);
  * e avança a física do tempo dt (s). */
 void previa_atualizar(Previa *pv, int personagem, float dt);
 
-/* Desenha a prévia no retângulo 'area' da tela. A câmera fica no ângulo
- * 'virar' (rad; 0 = de frente, negativo = o lutador olha para a direita da
- * tela) e vai e volta 'giro' rad em volta dele. Chamar entre BeginDrawing e
- * EndDrawing. Recursos não é const pelo mesmo motivo de render_cena. */
-void previa_desenhar(Previa *pv, Recursos *r, Rectangle area, float virar, float giro);
-
 /* Destrói o corpo, a física e a imagem. */
 void previa_liberar(Previa *pv);
 

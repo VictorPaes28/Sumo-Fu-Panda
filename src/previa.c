@@ -63,22 +63,6 @@ void previa_atualizar(Previa *pv, int personagem, float dt)
         pv->acumulador = 0.0f;
 }
 
-void previa_desenhar(Previa *pv, Recursos *r, Rectangle area, float virar, float giro)
-{
-    if (pv->personagem < 0)
-        return;
-    float angulo = virar + giro * sinf(2.0f * PI * pv->tempo / PREVIA_GIRO_PERIODO);
-    render_previa(&pv->corpo, pv->personagem, pv->jogador, r, pv->imagem, angulo);
-
-    /* A textura do OpenGL vem de cabeça para baixo: altura negativa desvira.
-     * A imagem é encaixada na área sem distorcer (mesma proporção). */
-    Rectangle origem = { 0, 0, (float)pv->imagem.texture.width, -(float)pv->imagem.texture.height };
-    float escala = fminf(area.width / PREVIA_LARGURA, area.height / PREVIA_ALTURA);
-    float w = PREVIA_LARGURA * escala, h = PREVIA_ALTURA * escala;
-    Rectangle destino = { area.x + (area.width - w) / 2.0f, area.y + (area.height - h) / 2.0f, w, h };
-    DrawTexturePro(pv->imagem.texture, origem, destino, (Vector2){ 0, 0 }, 0.0f, WHITE);
-}
-
 void previa_liberar(Previa *pv)
 {
     if (pv->personagem >= 0)

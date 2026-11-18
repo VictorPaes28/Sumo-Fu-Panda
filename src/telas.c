@@ -70,10 +70,6 @@ AcaoMenu menu_atualizar(TelaMenu *t, const Intencao in[2])
 }
 
 /* Medidas e cores da tela inicial. */
-static const float MENU_LUTADOR_L     = 330.0f;  /* área de cada lutador 3D */
-static const float MENU_LUTADOR_A     = 480.0f;
-static const float MENU_LUTADOR_Y     = 196.0f;
-static const float MENU_LUTADOR_BORDA = 40.0f;   /* da borda da tela */
 static const float MENU_BOTAO_L       = 300.0f;
 static const float MENU_BOTAO_A       = 58.0f;
 static const float MENU_BOTAO_Y       = 370.0f;
@@ -82,13 +78,6 @@ static const Color MENU_CEU_CIMA      = { 26, 18, 34, 255 };
 static const Color MENU_CEU_BAIXO     = { 86, 44, 36, 255 };
 static const Color MENU_ARGILA        = { 196, 158, 110, 255 };
 static const Color MENU_PALHA         = { 186, 164, 98, 255 };
-
-Rectangle menu_area_lutador(int lado)
-{
-    float x = (lado == 0) ? MENU_LUTADOR_BORDA
-                          : JANELA_LARGURA - MENU_LUTADOR_BORDA - MENU_LUTADOR_L;
-    return (Rectangle){ x, MENU_LUTADOR_Y, MENU_LUTADOR_L, MENU_LUTADOR_A };
-}
 
 /* Fundo: céu em degradê e, embaixo, o ringue (dohyô) visto de lado: a argila
  * clara e o anel de palha. */
@@ -402,11 +391,6 @@ static LayoutSelecao layout_do_lado(int jogador)
     float x_barras = l.previa.x + l.previa.width + SEL_BLOCO_ESPACO;
     l.barras = (Rectangle){ x_barras, y, l.grade.x + l.grade.width - x_barras, altura };
     return l;
-}
-
-Rectangle selecao_area_previa(int jogador)
-{
-    return layout_do_lado(jogador).previa;
 }
 
 /* Nome grande e, embaixo, o jeito de lutar. */

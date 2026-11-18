@@ -10,23 +10,41 @@ que enfraquecem o equilíbrio do adversário.
 - **Lista circular duplamente encadeada:** o combo de golpes (`src/combo.c`).
 - **Lista encadeada ordenada + insertion sort:** os hematomas (`src/hematoma.c`).
 
-**Situação:** jogável — menu, seleção de personagem e de arena, montagem do combo,
-luta com física, rounds, resultado e modo torneio. Corpo articulado de 13 peças (com
-cotovelos e pés), 11 golpes tirados de técnicas reais de sumô, 3 arenas (Ginásio Imperial,
-Pátio de Jade, Bosque de Bambu), música e efeitos sonoros, e 6 personagens: Po, Tai Lung, Oogway, Kai e Macaco, com
-modelo 3D, e Sumo Dream, o corpo de blocos da primeira versão. Cada um tem peso, força e
-equilíbrio próprios (`src/personagem.c`).
+**O que tem no jogo:** partida rápida e torneio da turma; 6 personagens (Po, Tai Lung,
+Oogway, Kai, Macaco e Sumo Dream, o corpo de blocos da nossa primeira versão), cada um com
+peso, força e equilíbrio próprios; 3 arenas (Ginásio Imperial, Pátio de Jade, Bosque de
+Bambu); 11 golpes tirados de técnicas reais de sumô; corpo com física de 13 peças; música
+e efeitos sonoros.
 
-## Comece por aqui
+## Equipe
 
-| Você é... | Leia |
+| Integrante | O que fez |
 |---|---|
-| Qualquer pessoa do grupo | `docs/ARQUITETURA.md` |
-| Equipe de arte | `docs/ASSETS.md` |
-| Golpes, animações e referências de sumô | `docs/ANIMACOES.md` |
-| Uma IA ajudando alguém | `AGENTS.md` |
+| Victor Paes | arquitetura, física do corpo e golpes, personagens 3D, HUD, tela inicial, torneio e arenas |
+| Mateus Diniz | lista circular do combo, lista ordenada de hematomas, testes e sons |
+| Breno Santiago | passadas do ragdoll, golpes e equilíbrio |
+| Arthur von Sohsten | telas de seleção de personagem e de montagem do combo |
 
-Por que as coisas são como são: `docs/DECISOES.md`.
+## Como jogar
+
+1. Cada jogador escolhe um lutador; depois, os dois escolhem a arena.
+2. Cada um monta o seu **combo**: a sequência de golpes que vai usar.
+3. Na luta, cada aperto do botão de golpe solta o **próximo golpe do combo**; depois do
+   último, volta para o primeiro (é a lista circular).
+4. Cada golpe que acerta deixa um **hematoma** no outro: quanto mais machucado, mais fácil
+   ele perde o equilíbrio. Os hematomas saram com o tempo.
+5. Ganha o round quem tirar o outro do ringue ou derrubá-lo. Golpear cansa: fique de olho
+   na barra de stamina.
+
+## Documentação
+
+| Para entender... | Leia |
+|---|---|
+| Os módulos e como eles se ligam | `docs/ARQUITETURA.md` |
+| Por que as coisas são como são | `docs/DECISOES.md` |
+| Os golpes e as técnicas de sumô | `docs/ANIMACOES.md` |
+| Como entram os modelos 3D e os sons | `docs/ASSETS.md` |
+| As regras para a IA que nos ajudou | `AGENTS.md` |
 
 ## Pré-requisitos (Windows)
 
@@ -37,13 +55,20 @@ Por que as coisas são como são: `docs/DECISOES.md`.
 - **Git**.
 - Internet na primeira compilação (o CMake baixa a raylib 6.0 e o ODE 0.16.6).
 
-## Compilar e rodar
+## Como executar o jogo
+
+Na pasta do projeto, rode os três comandos (a primeira compilação leva alguns minutos):
 
 ```bash
 cmake -S . -B build
 cmake --build build
 ./build/jogo
 ```
+
+No Prompt de Comando do Windows, o último passo é `build\jogo.exe`. O jogo abre no menu:
+escolha **Partida rápida** com C (jogador 1) ou K (jogador 2). Controles completos abaixo.
+
+## Testes
 
 Só os testes das estruturas (rápido, não baixa nada):
 

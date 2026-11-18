@@ -81,12 +81,6 @@ typedef struct {
     float alvo[ART_QTD][2];
 } Pose;
 
-/* Nome da peça em minúsculas e sem acento: "bacia", "tronco", "cabeca",
- * "braco_e", "braco_d", "coxa_e", "coxa_d", "canela_e", "canela_d",
- * "antebraco_e", "antebraco_d", "pe_e", "pe_d". Devolve "desconhecida" se
- * inválida. */
-const char *esqueleto_nome_parte(ParteCorpo parte);
-
 /* Tipo da articulação (dobradiça ou universal). */
 TipoArticulacao esqueleto_tipo_articulacao(Articulacao art);
 

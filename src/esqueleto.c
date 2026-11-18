@@ -6,22 +6,6 @@
  */
 #include "esqueleto.h"
 
-static const char *const NOMES_PARTES[PARTE_QTD] = {
-    [PARTE_BACIA]    = "bacia",
-    [PARTE_TRONCO]   = "tronco",
-    [PARTE_CABECA]   = "cabeca",
-    [PARTE_BRACO_E]  = "braco_e",
-    [PARTE_BRACO_D]  = "braco_d",
-    [PARTE_COXA_E]   = "coxa_e",
-    [PARTE_COXA_D]   = "coxa_d",
-    [PARTE_CANELA_E] = "canela_e",
-    [PARTE_CANELA_D] = "canela_d",
-    [PARTE_ANTEBRACO_E] = "antebraco_e",
-    [PARTE_ANTEBRACO_D] = "antebraco_d",
-    [PARTE_PE_E]     = "pe_e",
-    [PARTE_PE_D]     = "pe_d",
-};
-
 typedef struct {
     ParteCorpo pai;
     ParteCorpo filha;
@@ -65,13 +49,6 @@ void esqueleto_eixos(Articulacao art, float eixo1[3], float eixo2[3])
         eixo1[k] = ((int)art >= 0 && art < ART_QTD) ? EIXOS[art][0][k] : 0.0f;
         eixo2[k] = ((int)art >= 0 && art < ART_QTD) ? EIXOS[art][1][k] : 0.0f;
     }
-}
-
-const char *esqueleto_nome_parte(ParteCorpo parte)
-{
-    if ((int)parte < 0 || parte >= PARTE_QTD)
-        return "desconhecida";
-    return NOMES_PARTES[parte];
 }
 
 TipoArticulacao esqueleto_tipo_articulacao(Articulacao art)

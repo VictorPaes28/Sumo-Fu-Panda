@@ -34,9 +34,6 @@ void     menu_iniciar(TelaMenu *t);
 AcaoMenu menu_atualizar(TelaMenu *t, const Intencao in[2]);
 /* 'titulo' é a fonte do nome do jogo (Recursos.fonte_titulo). */
 void     menu_desenhar(const TelaMenu *t, Font titulo);
-/* Onde a tela inicial deixa espaço para um lutador 3D (lado 0 = esquerda,
- * 1 = direita). O main.c desenha ali as prévias (previa.h), frente a frente. */
-Rectangle menu_area_lutador(int lado);
 
 /* ------------------------------------------------------------- Seleção */
 /* Cada jogador escolhe um personagem do catálogo (personagem.h).
@@ -56,9 +53,6 @@ void        selecao_iniciar(TelaSelecao *t);
  * Os dois prontos -> SELECAO_CONCLUIDA. */
 AcaoSelecao selecao_atualizar(TelaSelecao *t, const Intencao in[2]);
 void        selecao_desenhar(const TelaSelecao *t);
-/* Onde a tela deixa o espaço da prévia 3D do lutador do jogador (0 ou 1).
- * A tela só desenha a moldura; o main.c desenha o lutador ali (previa.h). */
-Rectangle   selecao_area_previa(int jogador);
 
 /* ------------------------------------------------------------ Resultado */
 /* Fim da partida. Opções: 0 = "Revanche" (mesmos combos),
