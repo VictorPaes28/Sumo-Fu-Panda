@@ -241,6 +241,7 @@ static const FrasePersonagem FRASES[] = {
     { "Oogway",    "Lento, mas difícil de tirar do lugar." },
     { "Kai",       "O mais pesado e firme: avança como um muro." },
     { "Macaco",    "Leve, rápido e de braços longos." },
+    { "Sumo Dream", "O corpo de blocos da primeira versão." },
 };
 
 void selecao_iniciar(TelaSelecao *t)

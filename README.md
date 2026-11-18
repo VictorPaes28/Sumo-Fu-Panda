@@ -10,16 +10,12 @@ que enfraquecem o equilíbrio do adversário.
 - **Lista circular duplamente encadeada:** o combo de golpes (`src/combo.c`).
 - **Lista encadeada ordenada + insertion sort:** os hematomas (`src/hematoma.c`).
 
-**Situação:** jogável — menu, seleção, montagem do combo, luta com física, rounds e
-resultado. Corpo articulado de 13 peças (com cotovelos e pés), 11 golpes tirados de técnicas
-reais de sumô e 4 personagens:
-
-| Personagem | Jeito de lutar | Modelo 3D |
-|---|---|---|
-| Po | pesado, firme, bamboleia | ainda em blocos (`docs/ASSETS.md`) |
-| Tai Lung | leve e rápido, empurra forte | pintado |
-| Oogway | o mais lento, sereno, difícil de mover | pintado |
-| Minotauro | o mais pesado, tronco à frente | pintado |
+**Situação:** jogável — menu, seleção de personagem e de arena, montagem do combo,
+luta com física, rounds, resultado e modo torneio. Corpo articulado de 13 peças (com
+cotovelos e pés), 11 golpes tirados de técnicas reais de sumô, 3 arenas (Ginásio Imperial,
+Pátio de Jade, Bosque de Bambu), música e efeitos sonoros, e 6 personagens: Po, Tai Lung, Oogway, Kai e Macaco, com
+modelo 3D, e Sumo Dream, o corpo de blocos da primeira versão. Cada um tem peso, força e
+equilíbrio próprios (`src/personagem.c`).
 
 ## Comece por aqui
 
@@ -80,7 +76,7 @@ testes/     testes das estruturas de dados (rodam no terminal)
 demos/      programas de teste de partes do jogo
 ferramentas/ inspeciona_modelo (ossos de um .glb), preparar_modelo.py (FBX -> GLB, Blender)
             e extrai_animacoes (animações -> ângulos das articulações)
-assets/     modelos (.glb) e sons (.wav)
+assets/     modelos (.glb), sons e música (.wav) e fontes (.ttf)
 docs/       arquitetura, decisões, tarefas e guia de arte
 ```
 

@@ -100,10 +100,13 @@ target_compile_options(jogo PRIVATE ${SUMO_AVISOS})
 target_link_libraries(jogo PRIVATE raylib ODE)
 set_target_properties(jogo PROPERTIES LINKER_LANGUAGE CXX)
 
-# Copia assets/ para o lado do .exe (recursos.c procura lá).
-add_custom_command(TARGET jogo POST_BUILD
+# Copia assets/ para o lado do .exe (recursos.c procura lá). Um alvo só, de que
+# jogo e demos dependem: se cada um copiasse, as cópias rodariam ao mesmo tempo
+# na mesma pasta e a primeira compilação falhava.
+add_custom_target(copiar_assets
     COMMAND ${CMAKE_COMMAND} -E copy_directory
             ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:jogo>/assets)
+add_dependencies(jogo copiar_assets)
 
 # -----------------------------------------------------------------------------
 # Demonstração da física (Principal) — um corpo articulado sozinho, sem telas.
@@ -133,9 +136,7 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/demos/demo_partida.c)
     target_compile_options(demo_partida PRIVATE ${SUMO_AVISOS})
     target_link_libraries(demo_partida PRIVATE raylib ODE)
     set_target_properties(demo_partida PROPERTIES LINKER_LANGUAGE CXX)
-    add_custom_command(TARGET demo_partida POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-                ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:demo_partida>/assets)
+    add_dependencies(demo_partida copiar_assets)
 endif()
 
 # -----------------------------------------------------------------------------
@@ -170,7 +171,5 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/demos/demo_telas.c)
     target_include_directories(demo_telas PRIVATE src)
     target_compile_options(demo_telas PRIVATE ${SUMO_AVISOS})
     target_link_libraries(demo_telas PRIVATE raylib)
-    add_custom_command(TARGET demo_telas POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-                ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:demo_telas>/assets)
+    add_dependencies(demo_telas copiar_assets)
 endif()

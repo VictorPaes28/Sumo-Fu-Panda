@@ -246,22 +246,6 @@ static const ChaveGolpe CHAVES_PROJECAO_BAIXO[] = {
     CHAVE(0.80f, 0.0f, 0.0f, [ART_CINTURA] = { 0.0f, 0.0f }),
 };
 
-/* Tapa para baixo = hataki-komi: o contra-ataque de quem vê o outro vir
- * baixo demais. Recua um passo saindo da frente, levanta as mãos e bate de
- * cima para baixo nas costas e nos ombros dele, que vai de cara no chão.
- *   0,10  recua a perna esquerda e levanta as mãos;
- *   0,18  bate para baixo, o tronco acompanha; 0,30 segue; 0,55 guarda. */
-static const ChaveGolpe CHAVES_TAPA_BAIXO[] = {
-    CHAVE(0.00f, 0.0f, 0.0f, [ART_CINTURA] = { 0.0f, 0.0f }),
-    CHAVE(0.10f, 0.80f, 0.80f, [ART_CINTURA] = { -0.05f, 0.0f }, BRACOS(0.75f, 0.60f),
-          PERNA_E(-0.25f, 0.10f), PERNA_D(0.10f, 0.15f)),
-    CHAVE(0.18f, 0.10f, 0.10f, [ART_CINTURA] = { 0.35f, 0.10f }, [ART_PESCOCO] = { 0.15f, 0.0f },
-          BRACOS(-0.10f, 0.95f), PERNAS(0.25f, 0.25f)),
-    CHAVE(0.30f, 0.30f, 0.30f, [ART_CINTURA] = { 0.30f, 0.10f }, BRACOS(-0.20f, 0.80f),
-          PERNAS(0.25f, 0.25f)),
-    CHAVE(0.55f, 0.0f, 0.0f, [ART_CINTURA] = { 0.0f, 0.0f }),
-};
-
 /* Puxar para baixo = hiki-otoshi: segura o outro pelos braços/ombros quando
  * ele empurra, recua de uma vez e o puxa para a frente e para baixo.
  *   0,10  as mãos vão à frente; 0,20 agarra e recua as duas pernas, puxando
