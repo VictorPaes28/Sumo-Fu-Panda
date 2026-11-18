@@ -60,11 +60,13 @@ e efeitos sonoros.
 Na pasta do projeto, rode os três comandos (a primeira compilação leva alguns minutos):
 
 ```bash
-cmake -S . -B build
+cmake -G "MinGW Makefiles" -S . -B build
 cmake --build build
 ./build/jogo
 ```
 
+O `-G "MinGW Makefiles"` faz o CMake usar o MinGW; sem ele, se o Visual Studio estiver
+instalado, o CMake tenta o Visual Studio e para com "No CMAKE_C_COMPILER could be found".
 No Prompt de Comando do Windows, o último passo é `build\jogo.exe`. O jogo abre no menu:
 escolha **Partida rápida** com C (jogador 1) ou K (jogador 2). Controles completos abaixo.
 
@@ -73,7 +75,7 @@ escolha **Partida rápida** com C (jogador 1) ou K (jogador 2). Controles comple
 Só os testes das estruturas (rápido, não baixa nada):
 
 ```bash
-cmake -S . -B build-testes -DSUMO_SO_TESTES=ON
+cmake -G "MinGW Makefiles" -S . -B build-testes -DSUMO_SO_TESTES=ON
 cmake --build build-testes
 ctest --test-dir build-testes --output-on-failure
 ```
